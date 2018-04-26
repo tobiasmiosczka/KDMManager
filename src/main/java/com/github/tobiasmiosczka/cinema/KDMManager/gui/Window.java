@@ -19,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
-import java.util.List;
 
 public class Window extends JFrame {
 
@@ -43,8 +42,13 @@ public class Window extends JFrame {
         updateFtpLoginList();
     }
 
-    public void saveConfig() throws IOException {
-        XmlHelper.saveConfig(config, new FileOutputStream("config.xml"));
+    public void saveConfig() {
+        try {
+            XmlHelper.saveConfig(config, new FileOutputStream("config.xml"));
+        } catch (IOException e) {
+            //TODO: implement
+            e.printStackTrace();
+        }
     }
 
     public Window() {
@@ -75,6 +79,7 @@ public class Window extends JFrame {
             EmailLogin emailLogin = new EmailLoginDialog(new EmailLogin("", 21, "", "", "pop3s", "INNOX", false)).showDialog();
             if (emailLogin != null){
                 config.getEmailLogins().add(emailLogin);
+                saveConfig();
                 updateEmailLoginList();
             }
         });
@@ -90,6 +95,7 @@ public class Window extends JFrame {
                 int index = lEmailLoginList.getSelectedIndex();
                 config.getEmailLogins().remove(index);
                 config.getEmailLogins().add(index, emailLogin);
+                saveConfig();
                 updateEmailLoginList();
             }
         });
@@ -99,6 +105,7 @@ public class Window extends JFrame {
         JButton btDeleteEmailLogin = new JButton("Delete");
         btDeleteEmailLogin.addActionListener(a -> {
             lEmailLoginList.getSelectedValuesList().stream().forEach(config.getEmailLogins()::remove);
+            saveConfig();
             updateEmailLoginList();
         });
         btDeleteEmailLogin.setBounds(405, 245, 190, 30);
@@ -118,6 +125,7 @@ public class Window extends JFrame {
             FtpLogin ftpLogin = new FtpLoginDialog(new FtpLogin("", 995, "", "", "")).showDialog();
             if (ftpLogin != null) {
                 config.getFtpLogins().add(ftpLogin);
+                saveConfig();
                 updateFtpLoginList();
             }
         });
@@ -133,6 +141,7 @@ public class Window extends JFrame {
                 int index = lFtpLoginList.getSelectedIndex();
                 config.getFtpLogins().remove(index);
                 config.getFtpLogins().add(index, ftpLogin);
+                saveConfig();
                 updateFtpLoginList();
             }
         });
@@ -142,6 +151,7 @@ public class Window extends JFrame {
         JButton btDeleteFtpLogin = new JButton("Delete");
         btDeleteFtpLogin.addActionListener(a -> {
             lFtpLoginList.getSelectedValuesList().stream().forEach(config.getFtpLogins()::remove);
+            saveConfig();
             updateFtpLoginList();
         });
         btDeleteFtpLogin.setBounds(405, 520, 190, 30);
@@ -151,7 +161,7 @@ public class Window extends JFrame {
         btLoadKdms.addActionListener(a -> {
             loadKdms();
         });
-        btLoadKdms.setBounds(5, 600, 290, 30);
+        btLoadKdms.setBounds(5, 600, 590, 30);
         c.add(btLoadKdms);
     }
 
@@ -167,14 +177,8 @@ public class Window extends JFrame {
             //TODO: implement
             return;
         }
-        FtpHelper ftpHelper = null;
         try {
-            ftpHelper = new FtpHelper(config.getFtpLogins());
-        } catch (IOException | FtpException e) {
-            //TODO: implement
-            e.printStackTrace();
-        }
-        try {
+            FtpHelper ftpHelper = new FtpHelper(config.getFtpLogins());
             ftpHelper.uploadFiles(kdms);
         } catch (IOException | FtpException e) {
             //TODO: implement

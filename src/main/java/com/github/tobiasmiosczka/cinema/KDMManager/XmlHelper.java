@@ -24,9 +24,10 @@ public class XmlHelper {
     private static Namespace ns1 = Namespace.getNamespace("", "http://www.smpte-ra.org/schemas/430-3/2006/ETM");
     private static Namespace ns2 = Namespace.getNamespace("", "http://www.smpte-ra.org/schemas/430-1/2006/KDM");
     private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+    private static SAXBuilder saxBuilder = new SAXBuilder();
 
     public static Document getDocument(InputStream inputStream) throws JDOMException, IOException {
-        return new SAXBuilder().build(inputStream);
+        return saxBuilder.build(inputStream);
     }
 
     public static String getKdmServer(Document document) {
@@ -38,7 +39,7 @@ public class XmlHelper {
                 .getChild("X509SubjectName", ns2).getValue();
     }
 
-    public static Date getKdmFrom(Document document) throws ParseException {
+    public static Date getKdmValidFrom(Document document) throws ParseException {
         String value = document.getRootElement()
                 .getChild("AuthenticatedPublic", ns1)
                 .getChild("RequiredExtensions", ns1)
@@ -48,7 +49,7 @@ public class XmlHelper {
         return dateFormat.parse(value);
     }
 
-    public static Date getKdmTo(Document document) throws ParseException {
+    public static Date getKdmValidTo(Document document) throws ParseException {
         String value = document.getRootElement()
                 .getChild("AuthenticatedPublic", ns1)
                 .getChild("RequiredExtensions", ns1)
@@ -58,7 +59,7 @@ public class XmlHelper {
         return dateFormat.parse(value);
     }
 
-    public static Map<String, FtpLogin> loadFtpLogins(Document document) throws JDOMException, IOException {
+    private static Map<String, FtpLogin> loadFtpLogins(Document document) throws JDOMException, IOException {
         Map<String, FtpLogin> result = new HashMap<>();
         for (Element child : document.getRootElement().getChild("ftpLogins").getChildren()) {
             FtpLogin ftpLogin = new FtpLogin(
@@ -97,18 +98,17 @@ public class XmlHelper {
     }
 
     private static FtpLogin elementToFtpLogin(Element element) {
-        FtpLogin ftpLogin = new FtpLogin(
+        return new FtpLogin(
                 element.getChild("host").getValue(),
                 Integer.parseInt(element.getChild("port").getValue()),
                 element.getChild("user").getValue(),
                 element.getChild("password").getValue(),
                 element.getChild("serial").getValue()
         );
-        return ftpLogin;
     }
 
     private static EmailLogin elementToEmailLogin(Element element) {
-        EmailLogin emailLogin = new EmailLogin(
+        return new EmailLogin(
                 element.getChild("host").getValue(),
                 Integer.parseInt(element.getChild("port").getValue()),
                 element.getChild("user").getValue(),
@@ -117,7 +117,6 @@ public class XmlHelper {
                 element.getChild("folder").getValue(),
                 Boolean.parseBoolean(element.getChild("tls").getValue())
         );
-        return emailLogin;
     }
 
     public static Config loadConfig(Document document) {

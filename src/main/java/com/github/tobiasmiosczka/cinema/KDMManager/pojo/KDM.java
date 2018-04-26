@@ -17,18 +17,19 @@ public class KDM {
     private String fileName;
     private String data;
     private String server;
-    private Date from;
-    private Date to;
+    private Date validFrom;
+    private Date validTo;
 
     public KDM(InputStream inputStream, String fileName) throws JDOMException, IOException, ParseException {
+        //TODO: improve performance
         Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8.name());
         this.data = scanner.useDelimiter("\\A").next();
 
         this.fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
         Document document = XmlHelper.getDocument(this.getInputStream());
         this.server = XmlHelper.getKdmServer(document);
-        this.from = XmlHelper.getKdmFrom(document);
-        this.to = XmlHelper.getKdmTo(document);
+        this.validFrom = XmlHelper.getKdmValidFrom(document);
+        this.validTo = XmlHelper.getKdmValidTo(document);
     }
 
     public String getFileName() {
@@ -43,11 +44,11 @@ public class KDM {
         return this.server;
     }
 
-    public Date getFrom() {
-        return from;
+    public Date getValidFrom() {
+        return validFrom;
     }
 
-    public Date getTo() {
-        return to;
+    public Date getValidTo() {
+        return validTo;
     }
 }

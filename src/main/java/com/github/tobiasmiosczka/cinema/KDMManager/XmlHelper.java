@@ -26,6 +26,12 @@ public class XmlHelper {
     private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
     private static SAXBuilder saxBuilder = new SAXBuilder();
 
+    private static XMLOutputter outputter = new XMLOutputter();
+
+    static {
+        outputter.setFormat(Format.getPrettyFormat());
+    }
+
     public static Document getDocument(InputStream inputStream) throws JDOMException, IOException {
         return saxBuilder.build(inputStream);
     }
@@ -123,48 +129,39 @@ public class XmlHelper {
         Config config = new Config();
         Collection<FtpLogin> ftpLoginMap = config.getFtpLogins();
         document.getRootElement().getChild("ftpLogins").getChildren().stream().forEach(element -> {
-            FtpLogin ftpLogin = elementToFtpLogin(element);
-            ftpLoginMap.add(ftpLogin);
+            ftpLoginMap.add(elementToFtpLogin(element));
         });
         Collection<EmailLogin> emailLogins = config.getEmailLogins();
         document.getRootElement().getChild("emailLogins").getChildren().stream().forEach(element -> {
-            EmailLogin emailLogin = elementToEmailLogin(element);
-            emailLogins.add(emailLogin);
+            emailLogins.add(elementToEmailLogin(element));
         });
         return config;
     }
 
     public static Config loadConfig(InputStream inputStream) throws JDOMException, IOException {
         Document document = getDocument(inputStream);
-        inputStream.close();
         return loadConfig(document);
     }
 
     private static Document saveToDocument(Config config) {
         Document document = new Document();
         Element root = new Element("save");
-
         Element ftpLoginsElement = new Element("ftpLogins");
         for (FtpLogin ftpLogin: config.getFtpLogins()) {
             ftpLoginsElement.addContent(ftpLoginToElement(ftpLogin));
         }
         root.addContent(ftpLoginsElement);
-
         Element emailLoginsElement = new Element("emailLogins");
         for (EmailLogin emailLogin : config.getEmailLogins()) {
             emailLoginsElement.addContent(emailLoginToElement(emailLogin));
         }
         root.addContent(emailLoginsElement);
-
         document.setRootElement(root);
         return document;
     }
 
     public static void saveConfig(Config config, OutputStream outputStream) throws IOException {
         Document document = saveToDocument(config);
-        XMLOutputter outputter = new XMLOutputter();
-        outputter.setFormat(Format.getPrettyFormat());
         outputter.output(document, outputStream);
-        outputStream.close();
     }
 }

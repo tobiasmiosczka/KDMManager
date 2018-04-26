@@ -4,11 +4,21 @@ import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;
 import org.jdom2.JDOMException;
 
-import javax.mail.*;
+import javax.mail.BodyPart;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Part;
+import javax.mail.Session;
+import javax.mail.Store;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Properties;
 
 public class EmailHelper {
 
@@ -22,16 +32,16 @@ public class EmailHelper {
         return files;
     }
 
-    private static Set<KDM> handleMessages(Collection<Message> messages) throws IOException, JDOMException, ParseException, MessagingException {
-        Set<KDM> kdms = new HashSet<>();
+    private static Collection<KDM> handleMessages(Collection<Message> messages) throws IOException, JDOMException, ParseException, MessagingException {
+        Collection<KDM> kdms = new HashSet<>();
         for (Message message : messages) {
             if (message.getContentType().contains("multipart")) {
                 Multipart multipart = (Multipart) message.getContent();
                 for (int i = 0; i < multipart.getCount(); ++i) {
                     BodyPart bodyPart = multipart.getBodyPart(i);
+                    String fileName = bodyPart.getFileName();
                     if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())
-                            || !StringHelper.isBlank(bodyPart.getFileName())) {
-                        String fileName = bodyPart.getFileName();
+                            || !StringHelper.isBlank(fileName)) {
                         if(fileName == null)
                             continue;
                         if (fileName.endsWith(".zip"))
@@ -45,7 +55,6 @@ public class EmailHelper {
         return kdms;
     }
 
-
     public static Collection<KDM> getKdmsFromEmail(Collection<EmailLogin> emailLogins) throws MessagingException, IOException, JDOMException, ParseException {
         Collection<KDM> kdms = new HashSet<>();
         for (EmailLogin emailLogin : emailLogins) {
@@ -53,7 +62,6 @@ public class EmailHelper {
             properties.put("mail.pop3.host", emailLogin.getHost());
             properties.put("mail.pop3.port", emailLogin.getPort());
             properties.put("mail.pop3.starttls.enable", emailLogin.isTls());
-
             Session emailSession = Session.getDefaultInstance(properties);
             Store store = emailSession.getStore(emailLogin.getProtocol());
             store.connect(emailLogin.getHost(), emailLogin.getUser(), emailLogin.getPassword());

@@ -1,5 +1,6 @@
 package com.github.tobiasmiosczka.cinema.KDMManager.helper;
 
+import com.github.tobiasmiosczka.cinema.KDMManager.gui.IUpdate;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpException;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;
@@ -32,8 +33,10 @@ public class FtpHelper {
         return ftpClient;
     }
 
-    public void uploadFiles(Collection<KDM> files) throws IOException, FtpException {
+    public void uploadFiles(Collection<KDM> files, IUpdate iUpdate) throws IOException, FtpException {
+        int current = 0;
         for (KDM file : files) {
+            iUpdate.onUpdateSending(current++, files.size());
             FTPClient ftpClient = serverMap.get(file.getServer());
             if (ftpClient == null) {//what should be done, if the kdm is for an unknown server? probalby just skip it
                 continue;
@@ -42,5 +45,6 @@ public class FtpHelper {
                 throw new FtpException(ftpClient.getReplyCode());
             }
         }
+        iUpdate.onUpdateSending(current, files.size());
     }
 }

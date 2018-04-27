@@ -1,5 +1,6 @@
 package com.github.tobiasmiosczka.cinema.KDMManager.helper;
 
+import com.github.tobiasmiosczka.cinema.KDMManager.gui.IUpdate;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;
 import org.jdom2.JDOMException;
@@ -15,7 +16,6 @@ import javax.mail.Store;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
@@ -32,9 +32,11 @@ public class EmailHelper {
         return files;
     }
 
-    private static Collection<KDM> handleMessages(Collection<Message> messages) throws IOException, JDOMException, ParseException, MessagingException {
+    private static Collection<KDM> handleMessages(Message[] messages, IUpdate iUpdate) throws IOException, JDOMException, ParseException, MessagingException {
         Collection<KDM> kdms = new HashSet<>();
+        int current = 0;
         for (Message message : messages) {
+            iUpdate.onUpdateEmailLoading(current++, messages.length);
             if (message.getContentType().contains("multipart")) {
                 Multipart multipart = (Multipart) message.getContent();
                 for (int i = 0; i < multipart.getCount(); ++i) {
@@ -52,12 +54,15 @@ public class EmailHelper {
                 }
             }
         }
+        iUpdate.onUpdateEmailLoading(current, messages.length);
         return kdms;
     }
 
-    public static Collection<KDM> getKdmsFromEmail(Collection<EmailLogin> emailLogins) throws MessagingException, IOException, JDOMException, ParseException {
+    public static Collection<KDM> getKdmsFromEmail(Collection<EmailLogin> emailLogins, IUpdate iUpdate) throws MessagingException, IOException, JDOMException, ParseException {
         Collection<KDM> kdms = new HashSet<>();
+        int current = 0;
         for (EmailLogin emailLogin : emailLogins) {
+            iUpdate.onUpdateEmailBox(current++, emailLogins.size(), emailLogin.toString());
             Properties properties = new Properties();
             properties.put("mail.pop3.host", emailLogin.getHost());
             properties.put("mail.pop3.port", emailLogin.getPort());
@@ -67,10 +72,11 @@ public class EmailHelper {
             store.connect(emailLogin.getHost(), emailLogin.getUser(), emailLogin.getPassword());
             Folder emailFolder = store.getFolder(emailLogin.getFolder());
             emailFolder.open(Folder.READ_ONLY);
-            kdms.addAll(handleMessages(Arrays.asList(emailFolder.getMessages())));
+            kdms.addAll(handleMessages(emailFolder.getMessages(),iUpdate));
             emailFolder.close(false);
             store.close();
         }
+        iUpdate.onUpdateEmailBox(current, emailLogins.size(), "");
         return kdms;
     }
 }

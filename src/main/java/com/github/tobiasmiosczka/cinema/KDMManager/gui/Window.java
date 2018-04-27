@@ -7,20 +7,15 @@ import com.github.tobiasmiosczka.cinema.KDMManager.pojo.*;
 import org.jdom2.JDOMException;
 
 import javax.mail.MessagingException;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import java.awt.Container;
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
 
-public class Window extends JFrame {
+public class Window extends JFrame implements IUpdate {
 
     private JList<EmailLogin>   lEmailLoginList;
     private JList<FtpLogin>     lFtpLoginList;
@@ -28,7 +23,7 @@ public class Window extends JFrame {
     private final DefaultListModel<FtpLogin> dlmFtpLogins = new DefaultListModel<>();
     private final DefaultListModel<EmailLogin> dlmEmailLogin = new DefaultListModel<>();
 
-    private JLabel lbResult;
+    private JProgressBar pbMajor, pbMinor;
 
     private Config config = new Config();
 
@@ -55,12 +50,41 @@ public class Window extends JFrame {
         this.setVisible(true);
     }
 
+    @Override
+    public void onUpdateEmailLoading(int current, int total) {
+        System.out.println("onUpdateEmailLoading " + current + "/" + total);
+        EventQueue.invokeLater(() -> {
+            pbMinor.setMaximum(total);
+            pbMinor.setValue(current);
+        });
+    }
+
+    @Override
+    public void onUpdateSending(int current, int total) {
+        System.out.println("onUpdateSending " + current + "/" + total);
+        System.out.println("onUpdateEmailLoading " + current + "/" + total);
+        EventQueue.invokeLater(() -> {
+            pbMajor.setMaximum(total);
+            pbMajor.setValue(current);
+        });
+    }
+
+    @Override
+    public void onUpdateEmailBox(int current, int total, String host) {
+        System.out.println("onUpdateEmailBox " + current + "/" + total + " " + host);
+        EventQueue.invokeLater(() -> {
+            pbMajor.setMaximum(total);
+            pbMajor.setValue(current);
+            pbMajor.setString("Loading Emails from: " + host);
+        });
+    }
+
     private void init() {
         this.setTitle("KDMManager");
         this.setLayout(null);
         this.setResizable(false);
         Container c = this.getContentPane();
-        c.setPreferredSize(new Dimension(600, 635));
+        c.setPreferredSize(new Dimension(600, 665));
 
         JLabel lbEmailLogins = new JLabel("Email Logins");
         lbEmailLogins.setBounds(5, 5, 190, 30);
@@ -150,38 +174,46 @@ public class Window extends JFrame {
         btDeleteFtpLogin.setBounds(405, 520, 190, 30);
         c.add(btDeleteFtpLogin);
 
-        lbResult = new JLabel();
-        lbResult.setBounds(5, 555, 590, 30);
-        c.add(lbResult);
+        pbMajor = new JProgressBar();
+        pbMajor.setStringPainted(true);
+        pbMajor.setBounds(5, 555, 590, 30);
+        c.add(pbMajor);
+
+        pbMinor = new JProgressBar();
+        pbMinor.setStringPainted(true);
+        pbMinor.setBounds(5, 585, 590, 30);
+        c.add(pbMinor);
 
         JButton btLoadKdms = new JButton("Load KDMs");
         btLoadKdms.addActionListener(a -> loadKdms());
-        btLoadKdms.setBounds(5, 600, 590, 30);
+        btLoadKdms.setBounds(5, 625, 590, 30);
         c.add(btLoadKdms);
     }
 
     private void loadKdms() {
-        Collection<KDM> kdms = null;
-        long start = System.currentTimeMillis();
-        try {
-            kdms = EmailHelper.getKdmsFromEmail(config.getEmailLogins());
-        } catch (MessagingException | JDOMException | ParseException | IOException e) {
-            //TODO: implement
-            e.printStackTrace();
-        }
-        if(kdms == null) {
-            //TODO: implement
-            return;
-        }
-        try {
-            FtpHelper ftpHelper = new FtpHelper(config.getFtpLogins());
-            ftpHelper.uploadFiles(kdms);
-        } catch (IOException | FtpException e) {
-            //TODO: implement
-            e.printStackTrace();
-        }
-        long diff = System.currentTimeMillis() - start;
-        lbResult.setText("Loaded " + kdms.size() + " KDMs after " + diff / 1000 + " seconds.");
+        new Thread(() -> {
+                Collection<KDM> kdms = null;
+                long start = System.currentTimeMillis();
+                try {
+                    kdms = EmailHelper.getKdmsFromEmail(config.getEmailLogins(), this);
+                } catch (MessagingException | JDOMException | ParseException | IOException e) {
+                    //TODO: implement
+                    e.printStackTrace();
+                }
+                if(kdms == null) {
+                    //TODO: implement
+                    return;
+                }
+                try {
+                    FtpHelper ftpHelper = new FtpHelper(config.getFtpLogins());
+                    ftpHelper.uploadFiles(kdms, this);
+                } catch (IOException | FtpException e) {
+                    //TODO: implement
+                    e.printStackTrace();
+                }
+                long diff = System.currentTimeMillis() - start;
+                pbMajor.setString("Loaded " + kdms.size() + " KDMs after " + diff / 1000 + " seconds.");
+        }).start();
     }
 
     private void updateEmailLoginList() {

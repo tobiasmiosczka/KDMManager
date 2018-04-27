@@ -20,7 +20,7 @@ public class EmailLoginDialog extends JDialog {
     private JCheckBox cbTls;
     private EmailLogin result;
 
-    public EmailLoginDialog(EmailLogin emailLogin) {
+    private EmailLoginDialog(EmailLogin emailLogin) {
         super((java.awt.Frame) null, true);
         setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
         this.init(emailLogin);
@@ -47,9 +47,14 @@ public class EmailLoginDialog extends JDialog {
         );
     }
 
-    public EmailLogin showDialog() {
-        this.setVisible(true);
-        return this.result;
+    private EmailLogin getResult() {
+        return result;
+    }
+
+    public static EmailLogin getEmailLogin(EmailLogin preview) {
+        EmailLoginDialog dialog = new EmailLoginDialog(preview);
+        dialog.setVisible(true);
+        return dialog.getResult();
     }
 
     private void init(EmailLogin emailLogin) {

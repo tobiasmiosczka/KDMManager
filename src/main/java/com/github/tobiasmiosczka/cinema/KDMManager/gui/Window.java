@@ -1,8 +1,8 @@
 package com.github.tobiasmiosczka.cinema.KDMManager.gui;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.EmailHelper;
-import com.github.tobiasmiosczka.cinema.KDMManager.FtpHelper;
-import com.github.tobiasmiosczka.cinema.KDMManager.XmlHelper;
+import com.github.tobiasmiosczka.cinema.KDMManager.helper.EmailHelper;
+import com.github.tobiasmiosczka.cinema.KDMManager.helper.FtpHelper;
+import com.github.tobiasmiosczka.cinema.KDMManager.helper.XmlHelper;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.*;
 import org.jdom2.JDOMException;
 
@@ -22,27 +22,23 @@ import java.util.Collection;
 
 public class Window extends JFrame {
 
-    JList<EmailLogin>   lEmailLoginList;
-    JList<FtpLogin>     lFtpLoginList;
+    private JList<EmailLogin>   lEmailLoginList;
+    private JList<FtpLogin>     lFtpLoginList;
 
     private final DefaultListModel<FtpLogin> dlmFtpLogins = new DefaultListModel<>();
     private final DefaultListModel<EmailLogin> dlmEmailLogin = new DefaultListModel<>();
 
+    private JLabel lbResult;
 
-    Config config = new Config();
+    private Config config = new Config();
 
-    public static void main(String[] args) throws IOException, JDOMException {
-        Window window = new Window();
-        window.loadConfig();
-    }
-
-    public void loadConfig() throws IOException, JDOMException {
+    private void loadConfig() throws IOException, JDOMException {
         this.config = XmlHelper.loadConfig(new FileInputStream("config.xml"));
         updateEmailLoginList();
         updateFtpLoginList();
     }
 
-    public void saveConfig() {
+    private void saveConfig() {
         try {
             XmlHelper.saveConfig(config, new FileOutputStream("config.xml"));
         } catch (IOException e) {
@@ -51,7 +47,8 @@ public class Window extends JFrame {
         }
     }
 
-    public Window() {
+    public Window() throws IOException, JDOMException {
+        loadConfig();
         this.init();
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.pack();
@@ -76,7 +73,7 @@ public class Window extends JFrame {
 
         JButton btAddEmailLogin = new JButton("Add");
         btAddEmailLogin.addActionListener(a -> {
-            EmailLogin emailLogin = new EmailLoginDialog(new EmailLogin("", 21, "", "", "pop3s", "INNOX", false)).showDialog();
+            EmailLogin emailLogin = EmailLoginDialog.getEmailLogin(new EmailLogin("", 21, "", "", "pop3s", "INNOX", false));
             if (emailLogin != null){
                 config.getEmailLogins().add(emailLogin);
                 saveConfig();
@@ -90,11 +87,9 @@ public class Window extends JFrame {
         btEditEmailLogin.addActionListener(a -> {
             if (lEmailLoginList.getSelectedIndices().length != 1)
                 return;
-            EmailLogin emailLogin = new EmailLoginDialog(lEmailLoginList.getSelectedValue()).showDialog();
+            EmailLogin emailLogin = EmailLoginDialog.getEmailLogin(lEmailLoginList.getSelectedValue());
             if (emailLogin != null) {
-                int index = lEmailLoginList.getSelectedIndex();
-                config.getEmailLogins().remove(index);
-                config.getEmailLogins().add(index, emailLogin);
+                config.getEmailLogins().set(lEmailLoginList.getSelectedIndex(), emailLogin);
                 saveConfig();
                 updateEmailLoginList();
             }
@@ -122,7 +117,7 @@ public class Window extends JFrame {
 
         JButton btAddFtpLogin = new JButton("Add");
         btAddFtpLogin.addActionListener(a -> {
-            FtpLogin ftpLogin = new FtpLoginDialog(new FtpLogin("", 995, "", "", "")).showDialog();
+            FtpLogin ftpLogin = FtpLoginDialog.getFtpLogin(new FtpLogin("", 995, "", "", ""));
             if (ftpLogin != null) {
                 config.getFtpLogins().add(ftpLogin);
                 saveConfig();
@@ -136,11 +131,9 @@ public class Window extends JFrame {
         btEditFtpLogin.addActionListener(a -> {
             if (lFtpLoginList.getSelectedIndices().length != 1)
                 return;
-            FtpLogin ftpLogin = new FtpLoginDialog(lFtpLoginList.getSelectedValue()).showDialog();
+            FtpLogin ftpLogin = FtpLoginDialog.getFtpLogin(lFtpLoginList.getSelectedValue());
             if (ftpLogin != null) {
-                int index = lFtpLoginList.getSelectedIndex();
-                config.getFtpLogins().remove(index);
-                config.getFtpLogins().add(index, ftpLogin);
+                config.getFtpLogins().set(lFtpLoginList.getSelectedIndex(), ftpLogin);
                 saveConfig();
                 updateFtpLoginList();
             }
@@ -157,16 +150,19 @@ public class Window extends JFrame {
         btDeleteFtpLogin.setBounds(405, 520, 190, 30);
         c.add(btDeleteFtpLogin);
 
+        lbResult = new JLabel();
+        lbResult.setBounds(5, 555, 590, 30);
+        c.add(lbResult);
+
         JButton btLoadKdms = new JButton("Load KDMs");
-        btLoadKdms.addActionListener(a -> {
-            loadKdms();
-        });
+        btLoadKdms.addActionListener(a -> loadKdms());
         btLoadKdms.setBounds(5, 600, 590, 30);
         c.add(btLoadKdms);
     }
 
     private void loadKdms() {
         Collection<KDM> kdms = null;
+        long start = System.currentTimeMillis();
         try {
             kdms = EmailHelper.getKdmsFromEmail(config.getEmailLogins());
         } catch (MessagingException | JDOMException | ParseException | IOException e) {
@@ -184,7 +180,8 @@ public class Window extends JFrame {
             //TODO: implement
             e.printStackTrace();
         }
-
+        long diff = System.currentTimeMillis() - start;
+        lbResult.setText("Loaded " + kdms.size() + " KDMs after " + diff / 1000 + " seconds.");
     }
 
     private void updateEmailLoginList() {

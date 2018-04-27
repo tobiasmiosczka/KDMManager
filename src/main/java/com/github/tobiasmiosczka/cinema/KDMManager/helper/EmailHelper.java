@@ -1,4 +1,4 @@
-package com.github.tobiasmiosczka.cinema.KDMManager;
+package com.github.tobiasmiosczka.cinema.KDMManager.helper;
 
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;

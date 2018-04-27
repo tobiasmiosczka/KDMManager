@@ -1,6 +1,5 @@
 package com.github.tobiasmiosczka.cinema.KDMManager.gui;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
 
 import javax.swing.*;
@@ -19,7 +18,7 @@ public class FtpLoginDialog extends JDialog {
             tfSerial;
     private FtpLogin result;
 
-    public FtpLoginDialog(FtpLogin ftpLogin) {
+    private FtpLoginDialog(FtpLogin ftpLogin) {
         super((java.awt.Frame) null, true);
         setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
         this.init(ftpLogin);
@@ -44,9 +43,14 @@ public class FtpLoginDialog extends JDialog {
         );
     }
 
-    public FtpLogin showDialog() {
-        this.setVisible(true);
-        return this.result;
+    private FtpLogin getResult() {
+        return result;
+    }
+
+    public static FtpLogin getFtpLogin(FtpLogin preview) {
+        FtpLoginDialog dialog = new FtpLoginDialog(preview);
+        dialog.setVisible(true);
+        return dialog.getResult();
     }
 
     private void init(FtpLogin ftpLogin) {

@@ -1,4 +1,4 @@
-package com.github.tobiasmiosczka.cinema.KDMManager;
+package com.github.tobiasmiosczka.cinema.KDMManager.helper;
 
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
@@ -10,10 +10,16 @@ import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,13 +33,25 @@ public class XmlHelper {
     private static SAXBuilder saxBuilder = new SAXBuilder();
 
     private static XMLOutputter outputter = new XMLOutputter();
+    private static DocumentBuilder db;
 
     static {
+        try {
+            db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
         outputter.setFormat(Format.getPrettyFormat());
     }
 
     public static Document getDocument(InputStream inputStream) throws JDOMException, IOException {
         return saxBuilder.build(inputStream);
+    }
+
+    public static Document getDocument(String string) throws IOException, SAXException {
+        InputSource is = new InputSource();
+        is.setCharacterStream(new StringReader(string));
+        return (Document) db.parse(is);
     }
 
     public static String getKdmServer(Document document) {

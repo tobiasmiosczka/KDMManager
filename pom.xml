@@ -42,7 +42,7 @@
 					<archive>
 						<manifest>
 							<mainClass>
-								com.github.tobiasmiosczka.cinema.KDMManager.gui.Window
+								com.github.tobiasmiosczka.cinema.KDMManager.Starter
 							</mainClass>
 						</manifest>
 					</archive>

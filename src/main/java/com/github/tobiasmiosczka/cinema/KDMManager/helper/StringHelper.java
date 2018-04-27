@@ -1,4 +1,4 @@
-package com.github.tobiasmiosczka.cinema.KDMManager;
+package com.github.tobiasmiosczka.cinema.KDMManager.helper;
 
 public class StringHelper {
     public static boolean isBlank(final CharSequence cs) {

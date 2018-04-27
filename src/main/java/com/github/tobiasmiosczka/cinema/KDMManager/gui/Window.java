@@ -8,6 +8,7 @@ import org.jdom2.JDOMException;
 
 import javax.mail.MessagingException;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,10 +21,19 @@ public class Window extends JFrame implements IUpdate {
     private JList<EmailLogin>   lEmailLoginList;
     private JList<FtpLogin>     lFtpLoginList;
 
+    private static final Font headerFont = new Font("Arial", Font.BOLD, 20);
+
     private final DefaultListModel<FtpLogin> dlmFtpLogins = new DefaultListModel<>();
     private final DefaultListModel<EmailLogin> dlmEmailLogin = new DefaultListModel<>();
 
     private JProgressBar pbMajor, pbMinor;
+    JButton btLoadKdms,
+            btAddEmailLogin,
+            btEditEmailLogin,
+            btDeleteEmailLogin,
+            btAddFtpLogin,
+            btEditFtpLogin,
+            btDeleteFtpLogin;
 
     private Config config = new Config();
 
@@ -52,8 +62,8 @@ public class Window extends JFrame implements IUpdate {
 
     @Override
     public void onUpdateEmailLoading(int current, int total) {
-        System.out.println("onUpdateEmailLoading " + current + "/" + total);
         EventQueue.invokeLater(() -> {
+            pbMinor.setString(current + "/" + total);
             pbMinor.setMaximum(total);
             pbMinor.setValue(current);
         });
@@ -61,9 +71,8 @@ public class Window extends JFrame implements IUpdate {
 
     @Override
     public void onUpdateSending(int current, int total) {
-        System.out.println("onUpdateSending " + current + "/" + total);
-        System.out.println("onUpdateEmailLoading " + current + "/" + total);
         EventQueue.invokeLater(() -> {
+            pbMajor.setString(current + "/" + total);
             pbMajor.setMaximum(total);
             pbMajor.setValue(current);
         });
@@ -71,13 +80,30 @@ public class Window extends JFrame implements IUpdate {
 
     @Override
     public void onUpdateEmailBox(int current, int total, String host) {
-        System.out.println("onUpdateEmailBox " + current + "/" + total + " " + host);
         EventQueue.invokeLater(() -> {
             pbMajor.setMaximum(total);
             pbMajor.setValue(current);
             pbMajor.setString("Loading Emails from: " + host);
         });
     }
+
+    @Override
+    public void onDone() {
+        EventQueue.invokeLater(() -> {
+            setUiEnabled(true);
+        });
+    }
+
+    private void setUiEnabled(boolean enabled) {
+        btLoadKdms.setEnabled(enabled);
+        btAddEmailLogin.setEnabled(enabled);
+        btEditEmailLogin.setEnabled(enabled);
+        btDeleteEmailLogin.setEnabled(enabled);
+        btAddFtpLogin.setEnabled(enabled);
+        btEditFtpLogin.setEnabled(enabled);
+        btDeleteFtpLogin.setEnabled(enabled);
+    }
+
 
     private void init() {
         this.setTitle("KDMManager");
@@ -86,16 +112,18 @@ public class Window extends JFrame implements IUpdate {
         Container c = this.getContentPane();
         c.setPreferredSize(new Dimension(600, 665));
 
-        JLabel lbEmailLogins = new JLabel("Email Logins");
-        lbEmailLogins.setBounds(5, 5, 190, 30);
+        JLabel lbEmailLogins = new JLabel("Email Logins", SwingConstants.CENTER);
+        lbEmailLogins.setFont(headerFont);
+        lbEmailLogins.setBounds(5, 5, 590, 30);
         c.add(lbEmailLogins);
 
         lEmailLoginList = new JList<>();
+        lEmailLoginList.setBorder(new LineBorder(Color.BLACK, 1));
         lEmailLoginList.setModel(dlmEmailLogin);
         lEmailLoginList.setBounds(5, 40, 590, 200);
         c.add(lEmailLoginList);
 
-        JButton btAddEmailLogin = new JButton("Add");
+        btAddEmailLogin = new JButton("Add");
         btAddEmailLogin.addActionListener(a -> {
             EmailLogin emailLogin = EmailLoginDialog.getEmailLogin(new EmailLogin("", 21, "", "", "pop3s", "INNOX", false));
             if (emailLogin != null){
@@ -107,7 +135,7 @@ public class Window extends JFrame implements IUpdate {
         btAddEmailLogin.setBounds(5, 245, 190, 30);
         c.add(btAddEmailLogin);
 
-        JButton btEditEmailLogin = new JButton("Edit");
+        btEditEmailLogin = new JButton("Edit");
         btEditEmailLogin.addActionListener(a -> {
             if (lEmailLoginList.getSelectedIndices().length != 1)
                 return;
@@ -121,7 +149,7 @@ public class Window extends JFrame implements IUpdate {
         btEditEmailLogin.setBounds(205, 245, 190, 30);
         c.add(btEditEmailLogin);
 
-        JButton btDeleteEmailLogin = new JButton("Delete");
+        btDeleteEmailLogin = new JButton("Delete");
         btDeleteEmailLogin.addActionListener(a -> {
             lEmailLoginList.getSelectedValuesList().forEach(config.getEmailLogins()::remove);
             saveConfig();
@@ -130,16 +158,18 @@ public class Window extends JFrame implements IUpdate {
         btDeleteEmailLogin.setBounds(405, 245, 190, 30);
         c.add(btDeleteEmailLogin);
 
-        JLabel lbFtpLogins = new JLabel("FTP Logins");
-        lbFtpLogins.setBounds(5, 280, 190, 30);
+        JLabel lbFtpLogins = new JLabel("FTP Logins", SwingConstants.CENTER);
+        lbFtpLogins.setFont(headerFont);
+        lbFtpLogins.setBounds(5, 280, 590, 30);
         c.add(lbFtpLogins);
 
         lFtpLoginList = new JList<>();
+        lFtpLoginList.setBorder(new LineBorder(Color.BLACK, 1));
         lFtpLoginList.setModel(dlmFtpLogins);
         lFtpLoginList.setBounds(5, 315, 590, 200);
         c.add(lFtpLoginList);
 
-        JButton btAddFtpLogin = new JButton("Add");
+        btAddFtpLogin = new JButton("Add");
         btAddFtpLogin.addActionListener(a -> {
             FtpLogin ftpLogin = FtpLoginDialog.getFtpLogin(new FtpLogin("", 995, "", "", ""));
             if (ftpLogin != null) {
@@ -151,7 +181,7 @@ public class Window extends JFrame implements IUpdate {
         btAddFtpLogin.setBounds(5, 520, 190, 30);
         c.add(btAddFtpLogin);
 
-        JButton btEditFtpLogin = new JButton("Edit");
+        btEditFtpLogin = new JButton("Edit");
         btEditFtpLogin.addActionListener(a -> {
             if (lFtpLoginList.getSelectedIndices().length != 1)
                 return;
@@ -165,7 +195,7 @@ public class Window extends JFrame implements IUpdate {
         btEditFtpLogin.setBounds(205, 520, 190, 30);
         c.add(btEditFtpLogin);
 
-        JButton btDeleteFtpLogin = new JButton("Delete");
+        btDeleteFtpLogin = new JButton("Delete");
         btDeleteFtpLogin.addActionListener(a -> {
             lFtpLoginList.getSelectedValuesList().forEach(config.getFtpLogins()::remove);
             saveConfig();
@@ -184,13 +214,15 @@ public class Window extends JFrame implements IUpdate {
         pbMinor.setBounds(5, 585, 590, 30);
         c.add(pbMinor);
 
-        JButton btLoadKdms = new JButton("Load KDMs");
+        btLoadKdms = new JButton("Load KDMs");
         btLoadKdms.addActionListener(a -> loadKdms());
         btLoadKdms.setBounds(5, 625, 590, 30);
         c.add(btLoadKdms);
     }
 
     private void loadKdms() {
+        btLoadKdms.setEnabled(false);
+        setUiEnabled(false);
         new Thread(() -> {
                 Collection<KDM> kdms = null;
                 long start = System.currentTimeMillis();

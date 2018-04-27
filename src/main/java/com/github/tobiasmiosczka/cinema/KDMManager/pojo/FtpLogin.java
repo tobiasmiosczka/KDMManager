@@ -1,11 +1,11 @@
 package com.github.tobiasmiosczka.cinema.KDMManager.pojo;
 
 public class FtpLogin {
-    private String host;
-    private int port;
-    private String user;
-    private String password;
-    private String serial;
+    private final String host;
+    private final int port;
+    private final String user;
+    private final String password;
+    private final String serial;
 
     public FtpLogin(String host, int port, String user, String password, String serial) {
         this.host = host;

@@ -10,16 +10,10 @@ import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,31 +21,19 @@ import java.util.*;
 
 public class XmlHelper {
 
-    private static Namespace ns1 = Namespace.getNamespace("", "http://www.smpte-ra.org/schemas/430-3/2006/ETM");
-    private static Namespace ns2 = Namespace.getNamespace("", "http://www.smpte-ra.org/schemas/430-1/2006/KDM");
-    private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-    private static SAXBuilder saxBuilder = new SAXBuilder();
+    private static final Namespace ns1 = Namespace.getNamespace("", "http://www.smpte-ra.org/schemas/430-3/2006/ETM");
+    private static final Namespace ns2 = Namespace.getNamespace("", "http://www.smpte-ra.org/schemas/430-1/2006/KDM");
+    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+    private static final SAXBuilder saxBuilder = new SAXBuilder();
 
-    private static XMLOutputter outputter = new XMLOutputter();
-    private static DocumentBuilder db;
+    private static final XMLOutputter outputter = new XMLOutputter();
 
     static {
-        try {
-            db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
         outputter.setFormat(Format.getPrettyFormat());
     }
 
     public static Document getDocument(InputStream inputStream) throws JDOMException, IOException {
         return saxBuilder.build(inputStream);
-    }
-
-    public static Document getDocument(String string) throws IOException, SAXException {
-        InputSource is = new InputSource();
-        is.setCharacterStream(new StringReader(string));
-        return (Document) db.parse(is);
     }
 
     public static String getKdmServer(Document document) {
@@ -81,22 +63,6 @@ public class XmlHelper {
                 .getChild("ContentKeysNotValidAfter", ns2)
                 .getValue();
         return dateFormat.parse(value);
-    }
-
-    private static Map<String, FtpLogin> loadFtpLogins(Document document) throws JDOMException, IOException {
-        Map<String, FtpLogin> result = new HashMap<>();
-        for (Element child : document.getRootElement().getChild("ftpLogins").getChildren()) {
-            FtpLogin ftpLogin = new FtpLogin(
-                    child.getChild("host").getValue(),
-                    Integer.getInteger(child.getChild("port").getValue()),
-                    child.getChild("user").getValue(),
-                    child.getChild("password").getValue(),
-                    child.getChild("serial").getValue()
-            );
-            String serial = child.getChild("serial").getValue();
-            result.put(serial, ftpLogin);
-        }
-        return result;
     }
 
     private static Element ftpLoginToElement(FtpLogin ftpLogin) {
@@ -146,13 +112,9 @@ public class XmlHelper {
     public static Config loadConfig(Document document) {
         Config config = new Config();
         Collection<FtpLogin> ftpLoginMap = config.getFtpLogins();
-        document.getRootElement().getChild("ftpLogins").getChildren().stream().forEach(element -> {
-            ftpLoginMap.add(elementToFtpLogin(element));
-        });
+        document.getRootElement().getChild("ftpLogins").getChildren().forEach(element -> ftpLoginMap.add(elementToFtpLogin(element)));
         Collection<EmailLogin> emailLogins = config.getEmailLogins();
-        document.getRootElement().getChild("emailLogins").getChildren().stream().forEach(element -> {
-            emailLogins.add(elementToEmailLogin(element));
-        });
+        document.getRootElement().getChild("emailLogins").getChildren().forEach(element -> emailLogins.add(elementToEmailLogin(element)));
         return config;
     }
 

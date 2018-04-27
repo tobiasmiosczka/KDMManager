@@ -9,8 +9,6 @@ import java.awt.Dimension;
 
 public class FtpLoginDialog extends JDialog {
 
-    private JButton btOk,
-            btCancel;
     private JTextField  tfHost,
             tfPort,
             tfUsername,
@@ -95,7 +93,7 @@ public class FtpLoginDialog extends JDialog {
         tfSerial.setBounds(110, 80, 200, 20);
         c.add(tfSerial);
 
-        btOk = new JButton("Ok");
+        JButton btOk = new JButton("Ok");
         btOk.addActionListener(e -> {
             result = getValue();
             if (result == null)
@@ -106,7 +104,7 @@ public class FtpLoginDialog extends JDialog {
         btOk.setBounds(5, 165, 145, 30);
         this.getContentPane().add(btOk);
 
-        btCancel = new JButton("Cancel");
+        JButton btCancel = new JButton("Cancel");
         btCancel.addActionListener(e -> {
             result = null;
             this.setVisible(false);

@@ -9,8 +9,6 @@ import java.awt.Dimension;
 
 public class EmailLoginDialog extends JDialog {
 
-    private JButton btOk,
-                    btCancel;
     private JTextField  tfHost,
                         tfPort,
                         tfUsername,
@@ -114,7 +112,7 @@ public class EmailLoginDialog extends JDialog {
         cbTls.setBounds(110, 130, 200, 20);
         c.add(cbTls);
 
-        btOk = new JButton("Ok");
+        JButton btOk = new JButton("Ok");
         btOk.addActionListener(e -> {
             result = getValue();
             if (result == null)
@@ -125,7 +123,7 @@ public class EmailLoginDialog extends JDialog {
         btOk.setBounds(5, 165, 145, 30);
         this.getContentPane().add(btOk);
 
-        btCancel = new JButton("Cancel");
+        JButton btCancel = new JButton("Cancel");
         btCancel.addActionListener(e -> {
             result = null;
             this.setVisible(false);

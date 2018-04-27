@@ -1,13 +1,13 @@
 package com.github.tobiasmiosczka.cinema.KDMManager.pojo;
 
 public class EmailLogin {
-    private String host;
-    private int port;
-    private String user;
-    private String password;
-    private String protocol;
-    private String folder;
-    private boolean tls;
+    private final String host;
+    private final int port;
+    private final String user;
+    private final String password;
+    private final String protocol;
+    private final String folder;
+    private final boolean tls;
 
     public EmailLogin(String host, int port, String user, String password, String protocol, String folder, boolean tls) {
         this.host = host;

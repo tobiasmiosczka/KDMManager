@@ -99,7 +99,7 @@ public class Window extends JFrame {
 
         JButton btDeleteEmailLogin = new JButton("Delete");
         btDeleteEmailLogin.addActionListener(a -> {
-            lEmailLoginList.getSelectedValuesList().stream().forEach(config.getEmailLogins()::remove);
+            lEmailLoginList.getSelectedValuesList().forEach(config.getEmailLogins()::remove);
             saveConfig();
             updateEmailLoginList();
         });
@@ -143,7 +143,7 @@ public class Window extends JFrame {
 
         JButton btDeleteFtpLogin = new JButton("Delete");
         btDeleteFtpLogin.addActionListener(a -> {
-            lFtpLoginList.getSelectedValuesList().stream().forEach(config.getFtpLogins()::remove);
+            lFtpLoginList.getSelectedValuesList().forEach(config.getFtpLogins()::remove);
             saveConfig();
             updateFtpLoginList();
         });
@@ -186,11 +186,11 @@ public class Window extends JFrame {
 
     private void updateEmailLoginList() {
         dlmEmailLogin.removeAllElements();
-        config.getEmailLogins().stream().forEach(dlmEmailLogin::addElement);
+        config.getEmailLogins().forEach(dlmEmailLogin::addElement);
     }
 
     private void updateFtpLoginList() {
         dlmFtpLogins.removeAllElements();
-        config.getFtpLogins().stream().forEach(dlmFtpLogins::addElement);
+        config.getFtpLogins().forEach(dlmFtpLogins::addElement);
     }
 }

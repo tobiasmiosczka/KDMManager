@@ -14,9 +14,9 @@ import java.util.Scanner;
 
 public class KDM {
 
-    private String  fileName,
-                    data,
-                    server;
+    private final String  fileName;
+    private final String data;
+    private final String server;
     private Date    validFrom,
                     validTo;
 
@@ -49,5 +49,10 @@ public class KDM {
 
     public Date getValidTo() {
         return validTo;
+    }
+
+    @Override
+    public String toString() {
+        return "KDM for " + this.getServer() + "Valid: " + this.getValidFrom() + " - " + this.getValidTo();
     }
 }

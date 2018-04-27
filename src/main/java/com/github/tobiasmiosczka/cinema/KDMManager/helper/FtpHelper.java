@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class FtpHelper {
 
-    private Map<String, FTPClient>  serverMap = new HashMap<>();
+    private final Map<String, FTPClient>  serverMap = new HashMap<>();
 
     public FtpHelper(Collection<FtpLogin> ftpLogins) throws IOException, FtpException {
         for (FtpLogin ftpLogin : ftpLogins) {

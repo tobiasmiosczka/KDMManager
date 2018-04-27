@@ -1,5 +1,5 @@
 # KDMManager
-KDMManager is a tool projectionists to automatically download KDMs from e-mail servers and upload them to screen servers.
+KDMManager is a tool for projectionists to automatically download KDMs from e-mail servers and upload them to screen servers.
 
 Download
 -------------------------------------

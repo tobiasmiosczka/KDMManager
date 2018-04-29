@@ -26,14 +26,15 @@ public class Window extends JFrame implements IUpdate {
     private final DefaultListModel<FtpLogin> dlmFtpLogins = new DefaultListModel<>();
     private final DefaultListModel<EmailLogin> dlmEmailLogin = new DefaultListModel<>();
 
-    private JProgressBar pbMajor, pbMinor;
-    JButton btLoadKdms,
-            btAddEmailLogin,
-            btEditEmailLogin,
-            btDeleteEmailLogin,
-            btAddFtpLogin,
-            btEditFtpLogin,
-            btDeleteFtpLogin;
+    private JProgressBar    pbMajor,
+                            pbMinor;
+    private JButton btLoadKdms,
+                    btAddEmailLogin,
+                    btEditEmailLogin,
+                    btDeleteEmailLogin,
+                    btAddFtpLogin,
+                    btEditFtpLogin,
+                    btDeleteFtpLogin;
 
     private Config config = new Config();
 
@@ -57,7 +58,6 @@ public class Window extends JFrame implements IUpdate {
         this.init();
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.pack();
-        this.setVisible(true);
     }
 
     @Override
@@ -89,9 +89,7 @@ public class Window extends JFrame implements IUpdate {
 
     @Override
     public void onDone() {
-        EventQueue.invokeLater(() -> {
-            setUiEnabled(true);
-        });
+        EventQueue.invokeLater(() -> setUiEnabled(true));
     }
 
     private void setUiEnabled(boolean enabled) {
@@ -110,17 +108,17 @@ public class Window extends JFrame implements IUpdate {
         this.setLayout(null);
         this.setResizable(false);
         Container c = this.getContentPane();
-        c.setPreferredSize(new Dimension(600, 665));
+        c.setPreferredSize(new Dimension(350, 460));
 
-        JLabel lbEmailLogins = new JLabel("Email Logins", SwingConstants.CENTER);
+        JLabel lbEmailLogins = new JLabel("Email Logins:", SwingConstants.CENTER);
         lbEmailLogins.setFont(headerFont);
-        lbEmailLogins.setBounds(5, 5, 590, 30);
+        lbEmailLogins.setBounds(5, 5, 340, 30);
         c.add(lbEmailLogins);
 
         lEmailLoginList = new JList<>();
         lEmailLoginList.setBorder(new LineBorder(Color.BLACK, 1));
         lEmailLoginList.setModel(dlmEmailLogin);
-        lEmailLoginList.setBounds(5, 40, 590, 200);
+        lEmailLoginList.setBounds(5, 40, 340, 100);
         c.add(lEmailLoginList);
 
         btAddEmailLogin = new JButton("Add");
@@ -132,7 +130,7 @@ public class Window extends JFrame implements IUpdate {
                 updateEmailLoginList();
             }
         });
-        btAddEmailLogin.setBounds(5, 245, 190, 30);
+        btAddEmailLogin.setBounds(5, 145, 110, 30);
         c.add(btAddEmailLogin);
 
         btEditEmailLogin = new JButton("Edit");
@@ -146,7 +144,7 @@ public class Window extends JFrame implements IUpdate {
                 updateEmailLoginList();
             }
         });
-        btEditEmailLogin.setBounds(205, 245, 190, 30);
+        btEditEmailLogin.setBounds(120, 145, 110, 30);
         c.add(btEditEmailLogin);
 
         btDeleteEmailLogin = new JButton("Delete");
@@ -155,18 +153,18 @@ public class Window extends JFrame implements IUpdate {
             saveConfig();
             updateEmailLoginList();
         });
-        btDeleteEmailLogin.setBounds(405, 245, 190, 30);
+        btDeleteEmailLogin.setBounds(235, 145, 110, 30);
         c.add(btDeleteEmailLogin);
 
-        JLabel lbFtpLogins = new JLabel("FTP Logins", SwingConstants.CENTER);
+        JLabel lbFtpLogins = new JLabel("FTP Logins:", SwingConstants.CENTER);
         lbFtpLogins.setFont(headerFont);
-        lbFtpLogins.setBounds(5, 280, 590, 30);
+        lbFtpLogins.setBounds(5, 180, 340, 30);
         c.add(lbFtpLogins);
 
         lFtpLoginList = new JList<>();
         lFtpLoginList.setBorder(new LineBorder(Color.BLACK, 1));
         lFtpLoginList.setModel(dlmFtpLogins);
-        lFtpLoginList.setBounds(5, 315, 590, 200);
+        lFtpLoginList.setBounds(5, 215, 340, 100);
         c.add(lFtpLoginList);
 
         btAddFtpLogin = new JButton("Add");
@@ -178,7 +176,7 @@ public class Window extends JFrame implements IUpdate {
                 updateFtpLoginList();
             }
         });
-        btAddFtpLogin.setBounds(5, 520, 190, 30);
+        btAddFtpLogin.setBounds(5, 320, 110, 30);
         c.add(btAddFtpLogin);
 
         btEditFtpLogin = new JButton("Edit");
@@ -192,7 +190,7 @@ public class Window extends JFrame implements IUpdate {
                 updateFtpLoginList();
             }
         });
-        btEditFtpLogin.setBounds(205, 520, 190, 30);
+        btEditFtpLogin.setBounds(120, 320, 110, 30);
         c.add(btEditFtpLogin);
 
         btDeleteFtpLogin = new JButton("Delete");
@@ -201,22 +199,24 @@ public class Window extends JFrame implements IUpdate {
             saveConfig();
             updateFtpLoginList();
         });
-        btDeleteFtpLogin.setBounds(405, 520, 190, 30);
+        btDeleteFtpLogin.setBounds(235, 320, 110, 30);
         c.add(btDeleteFtpLogin);
 
         pbMajor = new JProgressBar();
         pbMajor.setStringPainted(true);
-        pbMajor.setBounds(5, 555, 590, 30);
+        pbMajor.setVisible(false);
+        pbMajor.setBounds(5, 355, 340, 30);
         c.add(pbMajor);
 
         pbMinor = new JProgressBar();
         pbMinor.setStringPainted(true);
-        pbMinor.setBounds(5, 585, 590, 30);
+        pbMinor.setVisible(false);
+        pbMinor.setBounds(5, 385, 340, 30);
         c.add(pbMinor);
 
         btLoadKdms = new JButton("Load KDMs");
         btLoadKdms.addActionListener(a -> loadKdms());
-        btLoadKdms.setBounds(5, 625, 590, 30);
+        btLoadKdms.setBounds(5, 425, 340, 30);
         c.add(btLoadKdms);
     }
 
@@ -226,6 +226,8 @@ public class Window extends JFrame implements IUpdate {
         new Thread(() -> {
                 Collection<KDM> kdms = null;
                 long start = System.currentTimeMillis();
+                pbMajor.setVisible(true);
+                pbMinor.setVisible(true);
                 try {
                     kdms = EmailHelper.getKdmsFromEmail(config.getEmailLogins(), this);
                 } catch (MessagingException | JDOMException | ParseException | IOException e) {
@@ -243,8 +245,9 @@ public class Window extends JFrame implements IUpdate {
                     //TODO: implement
                     e.printStackTrace();
                 }
-                long diff = System.currentTimeMillis() - start;
+            long diff = System.currentTimeMillis() - start;
                 pbMajor.setString("Loaded " + kdms.size() + " KDMs after " + diff / 1000 + " seconds.");
+                this.onDone();
         }).start();
     }
 

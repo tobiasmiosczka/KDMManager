@@ -9,6 +9,7 @@ public class Starter {
 
     public static void main(String[] args) throws IOException, JDOMException {
         Window window = new Window();
+        window.setVisible(true);
     }
 
 }

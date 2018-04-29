@@ -41,7 +41,7 @@ public class FtpHelper {
             if (ftpClient == null) {//what should be done, if the kdm is for an unknown server? probalby just skip it
                 continue;
             }
-            if (!ftpClient.storeFile(file.getFileName(), file.getInputStream())) {
+            if (!ftpClient.storeFile(file.getFileName(), StringHelper.toInputStream(file.getData()))) {
                 throw new FtpException(ftpClient.getReplyCode());
             }
         }

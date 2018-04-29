@@ -3,6 +3,7 @@ package com.github.tobiasmiosczka.cinema.KDMManager.helper;
 import com.github.tobiasmiosczka.cinema.KDMManager.gui.IUpdate;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;
+import org.jdom2.Document;
 import org.jdom2.JDOMException;
 
 import javax.mail.BodyPart;
@@ -15,46 +16,71 @@ import javax.mail.Session;
 import javax.mail.Store;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Properties;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class EmailHelper {
 
-    private static Collection<KDM> getKdmsFromZip(InputStream inputStream) throws IOException, JDOMException, ParseException {
-        Collection<KDM> files = ZipHelper.unzip(inputStream);
-        for (KDM file : files) {
-            if (!file.getFileName().endsWith(".xml")) {
-                files.remove(file);
+    public static Collection<KDM> unzip(InputStream inputStream) throws IOException, JDOMException, ParseException {
+        Collection<KDM> result = new HashSet<>();
+        ZipInputStream zis = new ZipInputStream(inputStream);
+        ZipEntry zipEntry = zis.getNextEntry();
+        while (zipEntry != null) {
+            String fileName = zipEntry.getName();
+            if (fileName.endsWith(".xml")) {
+                result.add(getKdmFromInputStream(zis, fileName));
+                zipEntry = zis.getNextEntry();
             }
         }
-        return files;
+        zis.closeEntry();
+        zis.close();
+        return result;
+    }
+
+    private static KDM getKdmFromInputStream(InputStream inputStream, String fileName) throws JDOMException, IOException, ParseException {
+        Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8.name());
+        String sData = scanner.useDelimiter("\\A").next();
+        Document document = XmlHelper.getDocument(StringHelper.toInputStream(sData));
+        return new KDM(
+            fileName.substring(fileName.lastIndexOf("/") + 1),
+            sData,
+            XmlHelper.getKdmServer(document),
+            XmlHelper.getKdmValidFrom(document),
+            XmlHelper.getKdmValidTo(document)
+        );
+    }
+
+    private static Integer[] gen(int i) {
+        Integer[] r = new Integer[i];
+        for (int w = 0; w < i; ++i) {
+            r[w] = w;
+        }
+        return r;
     }
 
     private static Collection<KDM> handleMessages(Message[] messages, IUpdate iUpdate) throws IOException, JDOMException, ParseException, MessagingException {
         Collection<KDM> kdms = new HashSet<>();
-        int current = 0;
-        for (Message message : messages) {
-            iUpdate.onUpdateEmailLoading(current++, messages.length);
+        for (int i = 0; i < messages.length; ++i) {
+            Message message = messages[i];
+            iUpdate.onUpdateEmailLoading(i, messages.length);
             if (message.getContentType().contains("multipart")) {
                 Multipart multipart = (Multipart) message.getContent();
-                for (int i = 0; i < multipart.getCount(); ++i) {
-                    BodyPart bodyPart = multipart.getBodyPart(i);
+                for (int j = 0; j < multipart.getCount(); ++j) {
+                    BodyPart bodyPart = multipart.getBodyPart(j);
                     String fileName = bodyPart.getFileName();
-                    if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())
-                            || !StringHelper.isBlank(fileName)) {
-                        if(fileName == null)
-                            continue;
+                    if (fileName != null && (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition()) || !StringHelper.isBlank(fileName))) {
                         if (fileName.endsWith(".zip"))
-                            kdms.addAll(getKdmsFromZip(bodyPart.getInputStream()));
+                            kdms.addAll(unzip(bodyPart.getInputStream()));
                         if (fileName.endsWith(".xml"))
-                            kdms.add(new KDM(bodyPart.getInputStream(), fileName));
+                            kdms.add(getKdmFromInputStream(bodyPart.getInputStream(), fileName));
                     }
                 }
             }
         }
-        iUpdate.onUpdateEmailLoading(current, messages.length);
+        iUpdate.onUpdateEmailLoading(messages.length, messages.length);
         return kdms;
     }
 

@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.Date;
 
 public class Window extends JFrame implements IUpdate {
 
@@ -36,10 +37,16 @@ public class Window extends JFrame implements IUpdate {
                     btEditFtpLogin,
                     btDeleteFtpLogin;
 
+    private JCheckBox cbIgnoreExpiredKdms;
+
     private Config config = new Config();
 
-    private void loadConfig() throws IOException, JDOMException {
-        this.config = XmlHelper.loadConfig(new FileInputStream("config.xml"));
+    private void loadConfig() throws JDOMException {
+        try {
+            this.config = XmlHelper.loadConfig(new FileInputStream("config.xml"));
+        } catch (IOException e) {
+            this.config = new Config();
+        }
         updateEmailLoginList();
         updateFtpLoginList();
     }
@@ -100,15 +107,15 @@ public class Window extends JFrame implements IUpdate {
         btAddFtpLogin.setEnabled(enabled);
         btEditFtpLogin.setEnabled(enabled);
         btDeleteFtpLogin.setEnabled(enabled);
+        cbIgnoreExpiredKdms.setEnabled(enabled);
     }
-
 
     private void init() {
         this.setTitle("KDMManager");
         this.setLayout(null);
         this.setResizable(false);
         Container c = this.getContentPane();
-        c.setPreferredSize(new Dimension(350, 460));
+        c.setPreferredSize(new Dimension(350, 495));
 
         JLabel lbEmailLogins = new JLabel("Email Logins:", SwingConstants.CENTER);
         lbEmailLogins.setFont(headerFont);
@@ -123,7 +130,7 @@ public class Window extends JFrame implements IUpdate {
 
         btAddEmailLogin = new JButton("Add");
         btAddEmailLogin.addActionListener(a -> {
-            EmailLogin emailLogin = EmailLoginDialog.getEmailLogin(new EmailLogin("", 21, "", "", "pop3s", "INNOX", false));
+            EmailLogin emailLogin = EmailLoginDialog.getEmailLogin(new EmailLogin("", 21, "", "", "pop3s", "INBOX", false));
             if (emailLogin != null){
                 config.getEmailLogins().add(emailLogin);
                 saveConfig();
@@ -202,21 +209,26 @@ public class Window extends JFrame implements IUpdate {
         btDeleteFtpLogin.setBounds(235, 320, 110, 30);
         c.add(btDeleteFtpLogin);
 
+        cbIgnoreExpiredKdms = new JCheckBox("Ignore expired KDMs");
+        cbIgnoreExpiredKdms.setSelected(true);
+        cbIgnoreExpiredKdms.setBounds(5, 355, 340, 30);
+        c.add(cbIgnoreExpiredKdms);
+
         pbMajor = new JProgressBar();
         pbMajor.setStringPainted(true);
         pbMajor.setVisible(false);
-        pbMajor.setBounds(5, 355, 340, 30);
+        pbMajor.setBounds(5, 390, 340, 30);
         c.add(pbMajor);
 
         pbMinor = new JProgressBar();
         pbMinor.setStringPainted(true);
         pbMinor.setVisible(false);
-        pbMinor.setBounds(5, 385, 340, 30);
+        pbMinor.setBounds(5, 420, 340, 30);
         c.add(pbMinor);
 
         btLoadKdms = new JButton("Load KDMs");
         btLoadKdms.addActionListener(a -> loadKdms());
-        btLoadKdms.setBounds(5, 425, 340, 30);
+        btLoadKdms.setBounds(5, 460, 340, 30);
         c.add(btLoadKdms);
     }
 
@@ -237,6 +249,10 @@ public class Window extends JFrame implements IUpdate {
                 if(kdms == null) {
                     //TODO: implement
                     return;
+                }
+                if (cbIgnoreExpiredKdms.isSelected()) {
+                    Date now = new Date();
+                    kdms.removeIf(kdm -> kdm.getValidTo().before(now));
                 }
                 try {
                     FtpHelper ftpHelper = new FtpHelper(config.getFtpLogins());

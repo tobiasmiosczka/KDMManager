@@ -53,14 +53,6 @@ public class EmailHelper {
         );
     }
 
-    private static Integer[] gen(int i) {
-        Integer[] r = new Integer[i];
-        for (int w = 0; w < i; ++i) {
-            r[w] = w;
-        }
-        return r;
-    }
-
     private static Collection<KDM> handleMessages(Message[] messages, IUpdate iUpdate) throws IOException, JDOMException, ParseException, MessagingException {
         Collection<KDM> kdms = new HashSet<>();
         for (int i = 0; i < messages.length; ++i) {

@@ -33,18 +33,19 @@ public class FtpHelper {
         return ftpClient;
     }
 
-    public void uploadFiles(Collection<KDM> files, IUpdate iUpdate) throws IOException, FtpException {
+    public void uploadFiles(Collection<KDM> kdms, IUpdate iUpdate) throws IOException, FtpException {
         int current = 0;
-        for (KDM file : files) {
-            iUpdate.onUpdateSending(current++, files.size());
-            FTPClient ftpClient = serverMap.get(file.getServer());
-            if (ftpClient == null) {//what should be done, if the kdm is for an unknown server? probalby just skip it
+        int total = kdms.size();
+        for (KDM kdm : kdms) {
+            iUpdate.onUpdateSending(current++, total);
+            FTPClient ftpClient = serverMap.get(kdm.getServer());
+            if (ftpClient == null) {//what should be done, if the kdm is for an unknown server? probably just skip it
                 continue;
             }
-            if (!ftpClient.storeFile(file.getFileName(), StringHelper.toInputStream(file.getData()))) {
+            if (!ftpClient.storeFile(kdm.getFileName(), StringHelper.toInputStream(kdm.getData()))) {
                 throw new FtpException(ftpClient.getReplyCode());
             }
         }
-        iUpdate.onUpdateSending(current, files.size());
+        iUpdate.onUpdateSending(current, total);
     }
 }

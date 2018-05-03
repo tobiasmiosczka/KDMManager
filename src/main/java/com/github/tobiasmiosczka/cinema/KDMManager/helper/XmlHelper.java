@@ -17,7 +17,8 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
 
 public class XmlHelper {
 
@@ -26,10 +27,10 @@ public class XmlHelper {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
     private static final SAXBuilder saxBuilder = new SAXBuilder();
 
-    private static final XMLOutputter outputter = new XMLOutputter();
+    private static final XMLOutputter xmlOutputter = new XMLOutputter();
 
     static {
-        outputter.setFormat(Format.getPrettyFormat());
+        xmlOutputter.setFormat(Format.getPrettyFormat());
     }
 
     public static Document getDocument(InputStream inputStream) throws JDOMException, IOException {
@@ -142,6 +143,6 @@ public class XmlHelper {
 
     public static void saveConfig(Config config, OutputStream outputStream) throws IOException {
         Document document = saveToDocument(config);
-        outputter.output(document, outputStream);
+        xmlOutputter.output(document, outputStream);
     }
 }

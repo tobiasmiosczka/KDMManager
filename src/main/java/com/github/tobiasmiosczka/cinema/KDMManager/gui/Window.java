@@ -60,7 +60,7 @@ public class Window extends JFrame implements IUpdate {
         }
     }
 
-    public Window() throws IOException, JDOMException {
+    public Window() throws JDOMException {
         loadConfig();
         this.init();
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);

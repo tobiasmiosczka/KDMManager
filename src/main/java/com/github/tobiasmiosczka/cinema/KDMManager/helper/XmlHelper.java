@@ -26,11 +26,39 @@ public class XmlHelper {
     private static final Namespace ns2 = Namespace.getNamespace("", "http://www.smpte-ra.org/schemas/430-1/2006/KDM");
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
     private static final SAXBuilder saxBuilder = new SAXBuilder();
-
     private static final XMLOutputter xmlOutputter = new XMLOutputter();
 
     static {
         xmlOutputter.setFormat(Format.getPrettyFormat());
+    }
+
+    private static String getStringValue(Element element, String name) throws ConfigParseException {
+        try {
+            return element.getChild(name).getValue();
+        } catch (NullPointerException e) {
+            throw new ConfigParseException(element, name);
+        }
+    }
+
+    private static int getIntegerValue(Element element, String name) throws ConfigParseException {
+        try {
+            return Integer.parseInt(element.getChild(name).getValue());
+        } catch (NullPointerException|NumberFormatException e) {
+            throw new ConfigParseException(element, name);
+        }
+    }
+
+    private static boolean getBooleanValue(Element element, String name) throws ConfigParseException {
+        try {
+             String string = element.getChild(name).getValue();
+             switch (string) {
+                 case "true": return true;
+                 case "false": return false;
+                 default: throw new ConfigParseException(element, name);
+             }
+        } catch (NullPointerException e) {
+            throw new ConfigParseException(element, name);
+        }
     }
 
     public static Document getDocument(InputStream inputStream) throws JDOMException, IOException {
@@ -88,38 +116,42 @@ public class XmlHelper {
         return emailLoginElement;
     }
 
-    private static FtpLogin elementToFtpLogin(Element element) {
+    private static FtpLogin elementToFtpLogin(Element element) throws ConfigParseException {
         return new FtpLogin(
-                element.getChild("host").getValue(),
-                Integer.parseInt(element.getChild("port").getValue()),
-                element.getChild("user").getValue(),
-                element.getChild("password").getValue(),
-                element.getChild("serial").getValue()
+                getStringValue(element, "host"),
+                getIntegerValue(element, "port"),
+                getStringValue(element, "user"),
+                getStringValue(element, "password"),
+                getStringValue(element, "serial")
         );
     }
 
-    private static EmailLogin elementToEmailLogin(Element element) {
+    private static EmailLogin elementToEmailLogin(Element element) throws ConfigParseException {
         return new EmailLogin(
-                element.getChild("host").getValue(),
-                Integer.parseInt(element.getChild("port").getValue()),
-                element.getChild("user").getValue(),
-                element.getChild("password").getValue(),
-                element.getChild("protocol").getValue(),
-                element.getChild("folder").getValue(),
-                Boolean.parseBoolean(element.getChild("tls").getValue())
+                getStringValue(element, "host"),
+                getIntegerValue(element, "port"),
+                getStringValue(element, "user"),
+                getStringValue(element, "password"),
+                getStringValue(element, "protocol"),
+                getStringValue(element, "folder"),
+                getBooleanValue(element, "tls")
         );
     }
 
-    public static Config loadConfig(Document document) {
+    public static Config loadConfig(Document document) throws ConfigParseException {
         Config config = new Config();
         Collection<FtpLogin> ftpLoginMap = config.getFtpLogins();
-        document.getRootElement().getChild("ftpLogins").getChildren().forEach(element -> ftpLoginMap.add(elementToFtpLogin(element)));
+        for (Element element1 : document.getRootElement().getChild("ftpLogins").getChildren()) {
+            ftpLoginMap.add(elementToFtpLogin(element1));
+        }
         Collection<EmailLogin> emailLogins = config.getEmailLogins();
-        document.getRootElement().getChild("emailLogins").getChildren().forEach(element -> emailLogins.add(elementToEmailLogin(element)));
+        for (Element element : document.getRootElement().getChild("emailLogins").getChildren()) {
+            emailLogins.add(elementToEmailLogin(element));
+        }
         return config;
     }
 
-    public static Config loadConfig(InputStream inputStream) throws JDOMException, IOException {
+    public static Config loadConfig(InputStream inputStream) throws JDOMException, IOException, ConfigParseException {
         Document document = getDocument(inputStream);
         return loadConfig(document);
     }

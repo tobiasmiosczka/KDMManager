@@ -11,4 +11,9 @@ public class FtpException extends Throwable {
     public int getCode() {
         return code;
     }
+
+    @Override
+    public String getMessage() {
+        return "FTP Error Code: " + getCode();
+    }
 }

@@ -8,8 +8,11 @@ import java.util.List;
 public class ConfigParseException extends Throwable {
 
     private final List<String> stack = new LinkedList<>();
+    private final String message;
 
-    public ConfigParseException(Element element, String name) {
+    public ConfigParseException(Element element, String name, String message) {
+        this.message = message;
+
         stack.add(name);
         while (element != null) {
             stack.add(element.getName());
@@ -19,6 +22,6 @@ public class ConfigParseException extends Throwable {
 
     @Override
     public String getMessage() {
-        return stack.stream().reduce("", (a, b) -> "<" + b + "> " + a);
+        return message + " " + stack.stream().reduce("", (a, b) -> "<" + b + "> " + a);
     }
 }

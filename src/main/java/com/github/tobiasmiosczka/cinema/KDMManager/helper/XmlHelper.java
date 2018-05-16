@@ -36,7 +36,7 @@ public class XmlHelper {
         try {
             return element.getChild(name).getValue();
         } catch (NullPointerException e) {
-            throw new ConfigParseException(element, name);
+            throw new ConfigParseException(element, name, "Could not parse string value.");
         }
     }
 
@@ -44,7 +44,7 @@ public class XmlHelper {
         try {
             return Integer.parseInt(element.getChild(name).getValue());
         } catch (NullPointerException|NumberFormatException e) {
-            throw new ConfigParseException(element, name);
+            throw new ConfigParseException(element, name, "Could not parse integer value.");
         }
     }
 
@@ -54,10 +54,10 @@ public class XmlHelper {
              switch (string) {
                  case "true": return true;
                  case "false": return false;
-                 default: throw new ConfigParseException(element, name);
+                 default: throw new ConfigParseException(element, name, "Could not parse boolean value.");
              }
         } catch (NullPointerException e) {
-            throw new ConfigParseException(element, name);
+            throw new ConfigParseException(element, name, "Could not parse boolean value.");
         }
     }
 

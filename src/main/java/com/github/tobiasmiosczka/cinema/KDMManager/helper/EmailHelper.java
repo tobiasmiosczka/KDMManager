@@ -18,7 +18,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.*;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -57,16 +61,15 @@ public class EmailHelper {
         if (s == null)
             return null;
         if (s.matches("^=\\?.*\\?.*\\?.*\\?=$")) {
-            String cypher = s.replaceAll("^=\\?.*?\\?", "").replaceAll("\\?.*?\\?=$", "");
-            //String charset = s.replaceAll("^=\\?", "").replaceAll("\\?.*?\\?.*?\\?=$", "");
-            String text = s.replaceAll("^=\\?.*?\\?.*?\\?", "").replaceAll("\\?=$", "");
-            switch (cypher) {
+            s = s .substring(2, s.length() - 2);
+            String[] strings = s.split("\\?"); //[0]=charset, [1]=cypher, [2]=text
+            switch (strings[1]) {
                 case "Q":
-                    return text;
+                    return strings[2];
                 case "B":
-                    return new String(Base64.getDecoder().decode(text));
+                    return new String(Base64.getDecoder().decode(strings[2]));
                 default:
-                    return s;
+                    return strings[2];
             }
         } else {
             return s;

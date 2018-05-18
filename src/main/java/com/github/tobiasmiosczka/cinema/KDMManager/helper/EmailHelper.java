@@ -53,16 +53,37 @@ public class EmailHelper {
         );
     }
 
+    private static String decode(String s) {
+        if (s == null)
+            return null;
+        if (s.matches("^=\\?.*\\?.*\\?.*\\?=$")) {
+            String cypher = s.replaceAll("^=\\?.*?\\?", "").replaceAll("\\?.*?\\?=$", "");
+            //String charset = s.replaceAll("^=\\?", "").replaceAll("\\?.*?\\?.*?\\?=$", "");
+            String text = s.replaceAll("^=\\?.*?\\?.*?\\?", "").replaceAll("\\?=$", "");
+            switch (cypher) {
+                case "Q":
+                    return text;
+                case "B":
+                    return new String(Base64.getDecoder().decode(text));
+                default:
+                    return s;
+            }
+        } else {
+            return s;
+        }
+    }
+
     private static Collection<KDM> handleMessages(Message[] messages, IUpdate iUpdate) throws IOException, JDOMException, ParseException, MessagingException {
         Collection<KDM> kdms = new HashSet<>();
         for (int i = 0; i < messages.length; ++i) {
             Message message = messages[i];
             iUpdate.onUpdateEmailLoading(i, messages.length);
+
             if (message.getContentType().contains("multipart")) {
                 Multipart multipart = (Multipart) message.getContent();
                 for (int j = 0; j < multipart.getCount(); ++j) {
                     BodyPart bodyPart = multipart.getBodyPart(j);
-                    String fileName = bodyPart.getFileName();
+                    String fileName = decode(bodyPart.getFileName());
                     if (fileName != null && (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition()) || !StringHelper.isBlank(fileName))) {
                         if (fileName.endsWith(".zip"))
                             kdms.addAll(unzip(bodyPart.getInputStream()));

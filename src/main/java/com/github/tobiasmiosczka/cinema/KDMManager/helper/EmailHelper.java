@@ -61,14 +61,14 @@ public class EmailHelper {
         if (s == null)
             return null;
         if (s.matches("^=\\?.*\\?.*\\?.*\\?=$")) {
-            s = s .substring(2, s.length() - 2);
+            s = s.substring(2, s.length() - 2);
             String[] strings = s.split("\\?"); //[0]=charset, [1]=cypher, [2]=text
             switch (strings[1]) {
-                case "Q":
+                case "Q": //Type is quoted printable
                     return strings[2];
-                case "B":
+                case "B": //Type is base64
                     return new String(Base64.getDecoder().decode(strings[2]));
-                default:
+                default: //Type is unknown
                     return strings[2];
             }
         } else {

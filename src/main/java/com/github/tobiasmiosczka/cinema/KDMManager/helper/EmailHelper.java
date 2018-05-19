@@ -81,16 +81,15 @@ public class EmailHelper {
         for (int i = 0; i < messages.length; ++i) {
             Message message = messages[i];
             iUpdate.onUpdateEmailLoading(i, messages.length);
-
             if (message.getContentType().contains("multipart")) {
                 Multipart multipart = (Multipart) message.getContent();
-                for (int j = 0; j < multipart.getCount(); ++j) {
-                    BodyPart bodyPart = multipart.getBodyPart(j);
+                for (int part = 0; part < multipart.getCount(); ++part) {
+                    BodyPart bodyPart = multipart.getBodyPart(part);
                     String fileName = decode(bodyPart.getFileName());
                     if (fileName != null && (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition()) || !StringHelper.isBlank(fileName))) {
                         if (fileName.endsWith(".zip"))
                             kdms.addAll(unzip(bodyPart.getInputStream()));
-                        if (fileName.endsWith(".xml"))
+                        else if (fileName.endsWith(".xml"))
                             kdms.add(getKdmFromInputStream(bodyPart.getInputStream(), fileName));
                     }
                 }

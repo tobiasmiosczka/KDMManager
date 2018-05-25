@@ -4,13 +4,15 @@ import java.util.Date;
 
 public class KDM {
 
-    private final String fileName,
-                         data,
-                         server;
+    private final String    title,
+                            fileName,
+                            data,
+                            server;
     private final Date  validFrom,
                         validTo;
 
-    public KDM(String fileName, String data, String server, Date validFrom, Date validTo) {
+    public KDM(String title, String fileName, String data, String server, Date validFrom, Date validTo) {
+        this.title = title;
         this.fileName = fileName;
         this. data = data;
         this.server = server;
@@ -18,8 +20,12 @@ public class KDM {
         this.validTo = validTo;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
     public String getFileName() {
-        return this.fileName;
+        return fileName;
     }
 
     public String getData() {
@@ -27,7 +33,7 @@ public class KDM {
     }
 
     public String getServer() {
-        return this.server;
+        return server;
     }
 
     public Date getValidFrom() {
@@ -36,10 +42,5 @@ public class KDM {
 
     public Date getValidTo() {
         return validTo;
-    }
-
-    @Override
-    public String toString() {
-        return "KDM for " + this.getServer() + "Valid: " + this.getValidFrom() + " - " + this.getValidTo();
     }
 }

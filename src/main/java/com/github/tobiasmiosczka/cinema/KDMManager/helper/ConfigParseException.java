@@ -12,7 +12,6 @@ public class ConfigParseException extends Throwable {
 
     public ConfigParseException(Element element, String name, String message) {
         this.message = message;
-
         stack.add(name);
         while (element != null) {
             stack.add(element.getName());

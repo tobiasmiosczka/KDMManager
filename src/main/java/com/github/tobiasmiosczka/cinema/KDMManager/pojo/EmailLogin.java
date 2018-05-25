@@ -1,6 +1,7 @@
 package com.github.tobiasmiosczka.cinema.KDMManager.pojo;
 
 public class EmailLogin {
+    private final String description;
     private final String host;
     private final int port;
     private final String user;
@@ -9,7 +10,8 @@ public class EmailLogin {
     private final String folder;
     private final boolean tls;
 
-    public EmailLogin(String host, int port, String user, String password, String protocol, String folder, boolean tls) {
+    public EmailLogin(String description, String host, int port, String user, String password, String protocol, String folder, boolean tls) {
+        this.description = description;
         this.host = host;
         this.port = port;
         this.user = user;
@@ -17,6 +19,10 @@ public class EmailLogin {
         this.protocol = protocol;
         this.folder = folder;
         this.tls = tls;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public String getHost() {
@@ -48,6 +54,6 @@ public class EmailLogin {
     }
 
     public String toString() {
-        return this.getUser() + "@" + this.host + ":" + this.port;
+        return this.getDescription();
     }
 }

@@ -1,6 +1,6 @@
 package com.github.tobiasmiosczka.cinema.KDMManager.helper;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.gui.IUpdate;
+import com.github.tobiasmiosczka.cinema.KDMManager.IUpdateProgress;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;
 import org.jdom2.Document;
@@ -28,14 +28,14 @@ import java.util.zip.ZipInputStream;
 
 public class EmailHelper {
 
-    public static Collection<KDM> unzip(InputStream inputStream) throws IOException, JDOMException, ParseException {
+    private static Collection<KDM> unzip(IUpdateProgress iUpdateProgress, InputStream inputStream) throws IOException, JDOMException, ParseException {
         Collection<KDM> result = new HashSet<>();
         ZipInputStream zis = new ZipInputStream(inputStream);
         ZipEntry zipEntry = zis.getNextEntry();
         while (zipEntry != null) {
             String fileName = zipEntry.getName();
             if (fileName.endsWith(".xml")) {
-                result.add(getKdmFromInputStream(zis, fileName));
+                result.add(getKdmFromInputStream(iUpdateProgress, zis, fileName));
                 zipEntry = zis.getNextEntry();
             }
         }
@@ -44,17 +44,20 @@ public class EmailHelper {
         return result;
     }
 
-    private static KDM getKdmFromInputStream(InputStream inputStream, String fileName) throws JDOMException, IOException, ParseException {
+    private static KDM getKdmFromInputStream(IUpdateProgress iUpdateProgress, InputStream inputStream, String fileName) throws JDOMException, IOException, ParseException {
         Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8.name());
         String sData = scanner.useDelimiter("\\A").next();
         Document document = XmlHelper.getDocument(StringHelper.toInputStream(sData));
-        return new KDM(
+        KDM kdm = new KDM(
+            XmlHelper.getKdmTitle(document),
             fileName.substring(fileName.lastIndexOf("/") + 1),
             sData,
             XmlHelper.getKdmServer(document),
             XmlHelper.getKdmValidFrom(document),
             XmlHelper.getKdmValidTo(document)
         );
+        iUpdateProgress.onKdmFound(kdm);
+        return kdm;
     }
 
     private static String decode(String s) {
@@ -76,11 +79,11 @@ public class EmailHelper {
         }
     }
 
-    private static Collection<KDM> handleMessages(Message[] messages, IUpdate iUpdate) throws IOException, JDOMException, ParseException, MessagingException {
+    private static Collection<KDM> handleMessages(Message[] messages, IUpdateProgress iUpdateProgress) throws IOException, JDOMException, ParseException, MessagingException {
         Collection<KDM> kdms = new HashSet<>();
         for (int i = 0; i < messages.length; ++i) {
             Message message = messages[i];
-            iUpdate.onUpdateEmailLoading(i, messages.length);
+            iUpdateProgress.onUpdateEmailLoading(i, messages.length);
             if (message.getContentType().contains("multipart")) {
                 Multipart multipart = (Multipart) message.getContent();
                 for (int part = 0; part < multipart.getCount(); ++part) {
@@ -88,22 +91,22 @@ public class EmailHelper {
                     String fileName = decode(bodyPart.getFileName());
                     if (fileName != null && (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition()) || !StringHelper.isBlank(fileName))) {
                         if (fileName.endsWith(".zip"))
-                            kdms.addAll(unzip(bodyPart.getInputStream()));
+                            kdms.addAll(unzip(iUpdateProgress, bodyPart.getInputStream()));
                         else if (fileName.endsWith(".xml"))
-                            kdms.add(getKdmFromInputStream(bodyPart.getInputStream(), fileName));
+                            kdms.add(getKdmFromInputStream(iUpdateProgress, bodyPart.getInputStream(), fileName));
                     }
                 }
             }
         }
-        iUpdate.onUpdateEmailLoading(messages.length, messages.length);
+        iUpdateProgress.onUpdateEmailLoading(messages.length, messages.length);
         return kdms;
     }
 
-    public static Collection<KDM> getKdmsFromEmail(Collection<EmailLogin> emailLogins, IUpdate iUpdate) throws MessagingException, IOException, JDOMException, ParseException {
+    public static Collection<KDM> getKdmsFromEmail(Collection<EmailLogin> emailLogins, IUpdateProgress iUpdateProgress) throws MessagingException, IOException, JDOMException, ParseException {
         Collection<KDM> kdms = new HashSet<>();
         int current = 0;
         for (EmailLogin emailLogin : emailLogins) {
-            iUpdate.onUpdateEmailBox(current++, emailLogins.size(), emailLogin.toString());
+            iUpdateProgress.onUpdateEmailBox(current++, emailLogins.size(), emailLogin);
             Properties properties = new Properties();
             properties.put("mail.pop3.host", emailLogin.getHost());
             properties.put("mail.pop3.port", emailLogin.getPort());
@@ -113,11 +116,11 @@ public class EmailHelper {
             store.connect(emailLogin.getHost(), emailLogin.getUser(), emailLogin.getPassword());
             Folder emailFolder = store.getFolder(emailLogin.getFolder());
             emailFolder.open(Folder.READ_ONLY);
-            kdms.addAll(handleMessages(emailFolder.getMessages(),iUpdate));
+            kdms.addAll(handleMessages(emailFolder.getMessages(), iUpdateProgress));
             emailFolder.close(false);
             store.close();
         }
-        iUpdate.onUpdateEmailBox(current, emailLogins.size(), "");
+        iUpdateProgress.onDoneLoading(kdms.size());
         return kdms;
     }
 }

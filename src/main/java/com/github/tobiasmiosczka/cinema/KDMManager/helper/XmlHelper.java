@@ -65,13 +65,23 @@ public class XmlHelper {
         return saxBuilder.build(inputStream);
     }
 
+    public static String getKdmTitle(Document document) {
+        return document.getRootElement()
+                .getChild("AuthenticatedPublic", ns1)
+                .getChild("RequiredExtensions", ns1)
+                .getChild("KDMRequiredExtensions", ns2)
+                .getChild("ContentTitleText", ns2)
+                .getValue();
+    }
+
     public static String getKdmServer(Document document) {
         return document.getRootElement()
                 .getChild("AuthenticatedPublic", ns1)
                 .getChild("RequiredExtensions", ns1)
                 .getChild("KDMRequiredExtensions", ns2)
                 .getChild("Recipient", ns2)
-                .getChild("X509SubjectName", ns2).getValue();
+                .getChild("X509SubjectName", ns2)
+                .getValue();
     }
 
     public static Date getKdmValidFrom(Document document) throws ParseException {
@@ -96,6 +106,7 @@ public class XmlHelper {
 
     private static Element ftpLoginToElement(FtpLogin ftpLogin) {
         Element ftpLoginElement = new Element("ftpLogin");
+        ftpLoginElement.addContent(new Element("description").setText(ftpLogin.getDescription()));
         ftpLoginElement.addContent(new Element("serial").setText(ftpLogin.getSerial()));
         ftpLoginElement.addContent(new Element("host").setText(ftpLogin.getHost()));
         ftpLoginElement.addContent(new Element("port").setText(""+ftpLogin.getPort()));
@@ -106,6 +117,7 @@ public class XmlHelper {
 
     private static Element emailLoginToElement(EmailLogin emailLogin) {
         Element emailLoginElement = new Element("emailLogin");
+        emailLoginElement.addContent(new Element("description").setText(emailLogin.getDescription()));
         emailLoginElement.addContent(new Element("host").setText(emailLogin.getHost()));
         emailLoginElement.addContent(new Element("port").setText(""+emailLogin.getPort()));
         emailLoginElement.addContent(new Element("user").setText(emailLogin.getUser()));
@@ -118,6 +130,7 @@ public class XmlHelper {
 
     private static FtpLogin elementToFtpLogin(Element element) throws ConfigParseException {
         return new FtpLogin(
+                getStringValue(element, "description"),
                 getStringValue(element, "host"),
                 getIntegerValue(element, "port"),
                 getStringValue(element, "user"),
@@ -128,6 +141,7 @@ public class XmlHelper {
 
     private static EmailLogin elementToEmailLogin(Element element) throws ConfigParseException {
         return new EmailLogin(
+                getStringValue(element, "description"),
                 getStringValue(element, "host"),
                 getIntegerValue(element, "port"),
                 getStringValue(element, "user"),

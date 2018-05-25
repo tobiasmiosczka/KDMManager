@@ -1,18 +1,24 @@
 package com.github.tobiasmiosczka.cinema.KDMManager.pojo;
 
 public class FtpLogin {
+    private final String description;
     private final String host;
-    private final int port;
     private final String user;
     private final String password;
     private final String serial;
+    private final int port;
 
-    public FtpLogin(String host, int port, String user, String password, String serial) {
+    public FtpLogin(String description, String host, int port, String user, String password, String serial) {
+        this.description = description;
         this.host = host;
         this.port = port;
         this.user = user;
         this.password = password;
         this.serial = serial;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public String getHost() {
@@ -36,6 +42,6 @@ public class FtpLogin {
     }
 
     public String toString() {
-        return this.getUser() + "@" + this.getHost() + ":" + this.getPort();
+        return this.getDescription();
     }
 }

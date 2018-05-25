@@ -1,17 +1,10 @@
 package com.github.tobiasmiosczka.cinema.KDMManager.gui;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.helper.ConfigParseException;
-import com.github.tobiasmiosczka.cinema.KDMManager.helper.EmailHelper;
-import com.github.tobiasmiosczka.cinema.KDMManager.helper.FtpHelper;
-import com.github.tobiasmiosczka.cinema.KDMManager.helper.XmlHelper;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.Config;
+import com.github.tobiasmiosczka.cinema.KDMManager.IUpdateGui;
+import com.github.tobiasmiosczka.cinema.KDMManager.Program;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpException;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;
-import org.jdom2.JDOMException;
 
-import javax.mail.MessagingException;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -19,7 +12,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
@@ -27,14 +19,11 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Collection;
-import java.util.Date;
+import java.util.List;
 
-public class Window extends JFrame implements IUpdate {
+public class Window extends JFrame implements IUpdateGui {
+
+    private Program program;
 
     private JList<EmailLogin>   lEmailLoginList;
     private JList<FtpLogin>     lFtpLoginList;
@@ -44,90 +33,17 @@ public class Window extends JFrame implements IUpdate {
     private final DefaultListModel<FtpLogin> dlmFtpLogins = new DefaultListModel<>();
     private final DefaultListModel<EmailLogin> dlmEmailLogin = new DefaultListModel<>();
 
-    private JProgressBar    pbMajor,
-                            pbMinor;
-    private JButton btLoadKdms,
-                    btAddEmailLogin,
-                    btEditEmailLogin,
-                    btDeleteEmailLogin,
-                    btAddFtpLogin,
-                    btEditFtpLogin,
-                    btDeleteFtpLogin;
-
     private JCheckBox cbIgnoreExpiredKdms;
 
-    private Config config = new Config();
-
-    private void loadConfig(String filename) {
-        try {
-            this.config = XmlHelper.loadConfig(new FileInputStream(filename));
-        } catch (IOException e) {
-            this.config = new Config();
-            JOptionPane.showMessageDialog(this, "Couldn't find " + filename + ". Starting with default configuration.");
-        } catch (JDOMException|ConfigParseException e) {
-            JOptionPane.showMessageDialog(this, "Error occurred while loading config.xml: " + e.getMessage());
-        }
-        updateEmailLoginList();
-        updateFtpLoginList();
-    }
-
-    private void saveConfig() {
-        try {
-            XmlHelper.saveConfig(config, new FileOutputStream("config.xml"));
-        } catch (IOException e) {
-            //TODO: implement
-            e.printStackTrace();
-        }
-    }
-
     public Window() {
-        loadConfig("config.xml");
         this.init();
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.pack();
+        this.setVisible(true);
     }
 
-    @Override
-    public void onUpdateEmailLoading(int current, int total) {
-        EventQueue.invokeLater(() -> {
-            pbMinor.setString(current + "/" + total);
-            pbMinor.setMaximum(total);
-            pbMinor.setValue(current);
-        });
-    }
-
-    @Override
-    public void onUpdateSending(int current, int total) {
-        EventQueue.invokeLater(() -> {
-            pbMajor.setString(current + "/" + total);
-            pbMajor.setMaximum(total);
-            pbMajor.setValue(current);
-        });
-    }
-
-    @Override
-    public void onUpdateEmailBox(int current, int total, String host) {
-        EventQueue.invokeLater(() -> {
-            pbMajor.setMaximum(total);
-            pbMajor.setValue(current);
-            pbMajor.setString("Loading Emails from: " + host);
-        });
-    }
-
-    @Override
-    public void onDone() {
-        EventQueue.invokeLater(() -> setUiEnabled(true));
-    }
-
-    private void setUiEnabled(boolean enabled) {
-        btLoadKdms.setEnabled(enabled);
-        btAddEmailLogin.setEnabled(enabled);
-        btEditEmailLogin.setEnabled(enabled);
-        btDeleteEmailLogin.setEnabled(enabled);
-        btAddFtpLogin.setEnabled(enabled);
-        btEditFtpLogin.setEnabled(enabled);
-        btDeleteFtpLogin.setEnabled(enabled);
-        cbIgnoreExpiredKdms.setEnabled(enabled);
+    public void setProgram(Program program) {
+        this.program = program;
     }
 
     private void init() {
@@ -148,33 +64,20 @@ public class Window extends JFrame implements IUpdate {
         lEmailLoginList.setBounds(5, 40, 340, 100);
         c.add(lEmailLoginList);
 
-        btAddEmailLogin = new JButton("Add");
-        btAddEmailLogin.addActionListener(a -> {
-            EmailLogin emailLogin = EmailLoginDialog.getEmailLogin(new EmailLogin("", 21, "", "", "pop3s", "INBOX", false));
-            if (emailLogin != null){
-                config.getEmailLogins().add(emailLogin);
-                saveConfig();
-                updateEmailLoginList();
-            }
-        });
+        JButton btAddEmailLogin = new JButton("Add");
+        btAddEmailLogin.addActionListener(a -> program.addEmailLogin(EmailLoginDialog.getEmailLogin(new EmailLogin("","", 21, "", "", "pop3s", "INBOX", false))));
         btAddEmailLogin.setBounds(5, 145, 110, 30);
         c.add(btAddEmailLogin);
 
-        btEditEmailLogin = new JButton("Edit");
+        JButton btEditEmailLogin = new JButton("Edit");
         btEditEmailLogin.addActionListener(a -> {
-            if (lEmailLoginList.getSelectedIndices().length != 1)
-                return;
-            EmailLogin emailLogin = EmailLoginDialog.getEmailLogin(lEmailLoginList.getSelectedValue());
-            if (emailLogin != null) {
-                config.getEmailLogins().set(lEmailLoginList.getSelectedIndex(), emailLogin);
-                saveConfig();
-                updateEmailLoginList();
-            }
+            if (lEmailLoginList.getSelectedIndices().length == 1)
+                program.updateEmailLogin(lEmailLoginList.getSelectedIndex(), EmailLoginDialog.getEmailLogin(lEmailLoginList.getSelectedValue()));
         });
         btEditEmailLogin.setBounds(120, 145, 110, 30);
         c.add(btEditEmailLogin);
 
-        btDeleteEmailLogin = new JButton("Delete");
+        JButton btDeleteEmailLogin = new JButton("Delete");
         btDeleteEmailLogin.addActionListener(a -> {
             int count = lEmailLoginList.getSelectedValuesList().size();
             int result = JOptionPane.showConfirmDialog(
@@ -183,9 +86,7 @@ public class Window extends JFrame implements IUpdate {
                     "Delete email logins",
                     JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
-                lEmailLoginList.getSelectedValuesList().forEach(config.getEmailLogins()::remove);
-                saveConfig();
-                updateFtpLoginList();
+                program.deleteEmailLogins(lEmailLoginList.getSelectedValuesList());
             }
         });
         btDeleteEmailLogin.setBounds(235, 145, 110, 30);
@@ -202,33 +103,21 @@ public class Window extends JFrame implements IUpdate {
         lFtpLoginList.setBounds(5, 215, 340, 100);
         c.add(lFtpLoginList);
 
-        btAddFtpLogin = new JButton("Add");
-        btAddFtpLogin.addActionListener(a -> {
-            FtpLogin ftpLogin = FtpLoginDialog.getFtpLogin(new FtpLogin("", 995, "", "", ""));
-            if (ftpLogin != null) {
-                config.getFtpLogins().add(ftpLogin);
-                saveConfig();
-                updateFtpLoginList();
-            }
-        });
+        JButton btAddFtpLogin = new JButton("Add");
+        btAddFtpLogin.addActionListener(a -> program.addFtpLogin(FtpLoginDialog.getFtpLogin(new FtpLogin("","", 995, "", "", ""))));
         btAddFtpLogin.setBounds(5, 320, 110, 30);
         c.add(btAddFtpLogin);
 
-        btEditFtpLogin = new JButton("Edit");
+        JButton btEditFtpLogin = new JButton("Edit");
         btEditFtpLogin.addActionListener(a -> {
             if (lFtpLoginList.getSelectedIndices().length != 1)
                 return;
-            FtpLogin ftpLogin = FtpLoginDialog.getFtpLogin(lFtpLoginList.getSelectedValue());
-            if (ftpLogin != null) {
-                config.getFtpLogins().set(lFtpLoginList.getSelectedIndex(), ftpLogin);
-                saveConfig();
-                updateFtpLoginList();
-            }
+            program.updateFtpLogin(lFtpLoginList.getSelectedIndex(), FtpLoginDialog.getFtpLogin(lFtpLoginList.getSelectedValue()));
         });
         btEditFtpLogin.setBounds(120, 320, 110, 30);
         c.add(btEditFtpLogin);
 
-        btDeleteFtpLogin = new JButton("Delete");
+        JButton btDeleteFtpLogin = new JButton("Delete");
         btDeleteFtpLogin.addActionListener(a -> {
             int count = lFtpLoginList.getSelectedValuesList().size();
             int result = JOptionPane.showConfirmDialog(
@@ -237,9 +126,7 @@ public class Window extends JFrame implements IUpdate {
                     "Delete FTP logins",
                     JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
-                lFtpLoginList.getSelectedValuesList().forEach(config.getFtpLogins()::remove);
-                saveConfig();
-                updateFtpLoginList();
+                program.deleteFtpLogins(lFtpLoginList.getSelectedValuesList());
             }
         });
         btDeleteFtpLogin.setBounds(235, 320, 110, 30);
@@ -250,63 +137,32 @@ public class Window extends JFrame implements IUpdate {
         cbIgnoreExpiredKdms.setBounds(5, 355, 340, 30);
         c.add(cbIgnoreExpiredKdms);
 
-        pbMajor = new JProgressBar();
-        pbMajor.setStringPainted(true);
-        pbMajor.setVisible(false);
-        pbMajor.setBounds(5, 390, 340, 30);
-        c.add(pbMajor);
-
-        pbMinor = new JProgressBar();
-        pbMinor.setStringPainted(true);
-        pbMinor.setVisible(false);
-        pbMinor.setBounds(5, 420, 340, 30);
-        c.add(pbMinor);
-
-        btLoadKdms = new JButton("Load KDMs");
-        btLoadKdms.addActionListener(a -> loadKdms());
+        JButton btLoadKdms = new JButton("Load KDMs");
+        btLoadKdms.addActionListener(a -> program.loadKdms(cbIgnoreExpiredKdms.isSelected()));
         btLoadKdms.setBounds(5, 460, 340, 30);
         c.add(btLoadKdms);
     }
 
-    private void loadKdms() {
-        btLoadKdms.setEnabled(false);
-        setUiEnabled(false);
-        new Thread(() -> {
-                Collection<KDM> kdms;
-                long start = System.currentTimeMillis();
-                pbMajor.setVisible(true);
-                pbMinor.setVisible(true);
-                try {
-                    kdms = EmailHelper.getKdmsFromEmail(config.getEmailLogins(), this);
-                } catch (MessagingException | JDOMException | ParseException | IOException e) {
-                    JOptionPane.showMessageDialog(this, "Error occurred while loading KDMs from Email: " + e.getMessage());
-                    setUiEnabled(true);
-                    return;
+    @Override
+    public void onUpdateEmailLogins(List<EmailLogin> emailLogins) {
+        EventQueue.invokeLater(() -> {
+                    dlmEmailLogin.removeAllElements();
+                    emailLogins.forEach(dlmEmailLogin::addElement);
                 }
-                if (cbIgnoreExpiredKdms.isSelected()) {
-                    Date now = new Date();
-                    kdms.removeIf(kdm -> kdm.getValidTo().before(now));
-                }
-                try {
-                    FtpHelper ftpHelper = new FtpHelper(config.getFtpLogins());
-                    ftpHelper.uploadFiles(kdms, this);
-                } catch (IOException | FtpException e) {
-                    JOptionPane.showMessageDialog(this, "Error occurred while sending KDMs: " + e.getMessage());
-                    setUiEnabled(true);
-                }
-            long diff = System.currentTimeMillis() - start;
-                pbMajor.setString("Loaded " + kdms.size() + " KDMs after " + diff / 1000 + " seconds.");
-                this.onDone();
-        }).start();
+        );
     }
 
-    private void updateEmailLoginList() {
-        dlmEmailLogin.removeAllElements();
-        config.getEmailLogins().forEach(dlmEmailLogin::addElement);
+    @Override
+    public void onUpdateFtpLogins(List<FtpLogin> ftpLogins) {
+        EventQueue.invokeLater(() -> {
+                    dlmFtpLogins.removeAllElements();
+                    ftpLogins.forEach(dlmFtpLogins::addElement);
+                }
+        );
     }
 
-    private void updateFtpLoginList() {
-        dlmFtpLogins.removeAllElements();
-        config.getFtpLogins().forEach(dlmFtpLogins::addElement);
+    @Override
+    public void onErrorOccurred(String message) {
+        JOptionPane.showMessageDialog(this, message);
     }
 }

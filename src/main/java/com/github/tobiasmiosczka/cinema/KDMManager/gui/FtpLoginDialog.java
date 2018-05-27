@@ -2,7 +2,10 @@ package com.github.tobiasmiosczka.cinema.KDMManager.gui;
 
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -24,24 +27,6 @@ public class FtpLoginDialog extends JDialog {
         this.init(ftpLogin);
         this.setPreferredSize(new Dimension(330, 215));
         this.pack();
-    }
-
-    private FtpLogin getValue() {
-        int port;
-        try {
-            port = Integer.parseInt(tfPort.getText());
-        } catch (NumberFormatException e) {
-            tfPort.setBackground(Color.RED);
-            return null;
-        }
-        return new FtpLogin(
-                tfDescription.getText(),
-                tfHost.getText(),
-                port,
-                tfUsername.getText(),
-                tfPassword.getText(),
-                tfSerial.getText()
-        );
     }
 
     private FtpLogin getResult() {
@@ -105,9 +90,21 @@ public class FtpLoginDialog extends JDialog {
 
         JButton btOk = new JButton("Ok");
         btOk.addActionListener(e -> {
-            result = getValue();
-            if (result == null)
+            int port;
+            try {
+                port = Integer.parseInt(tfPort.getText());
+            } catch (NumberFormatException ex) {
+                tfPort.setBackground(Color.RED);
                 return;
+            }
+            result = new FtpLogin(
+                    tfDescription.getText(),
+                    tfHost.getText(),
+                    port,
+                    tfUsername.getText(),
+                    tfPassword.getText(),
+                    tfSerial.getText()
+            );
             this.setVisible(false);
             this.dispose();
         });

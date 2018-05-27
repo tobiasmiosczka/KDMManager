@@ -31,26 +31,6 @@ public class EmailLoginDialog extends JDialog {
         this.pack();
     }
 
-    private EmailLogin getValue() {
-        int port;
-        try {
-            port = Integer.parseInt(tfPort.getText());
-        } catch (NumberFormatException e) {
-            tfPort.setBackground(Color.RED);
-            return null;
-        }
-        return new EmailLogin(
-                tfDescription.getText(),
-                tfHost.getText(),
-                port,
-                tfUsername.getText(),
-                tfPassword.getText(),
-                tfProtocol.getText(),
-                tfFolder.getText(),
-                cbTls.isSelected()
-        );
-    }
-
     private EmailLogin getResult() {
         return result;
     }
@@ -127,9 +107,23 @@ public class EmailLoginDialog extends JDialog {
 
         JButton btOk = new JButton("Ok");
         btOk.addActionListener(e -> {
-            result = getValue();
-            if (result == null)
+            int port;
+            try {
+                port = Integer.parseInt(tfPort.getText());
+            } catch (NumberFormatException ex) {
+                tfPort.setBackground(Color.RED);
                 return;
+            }
+            result = new EmailLogin(
+                    tfDescription.getText(),
+                    tfHost.getText(),
+                    port,
+                    tfUsername.getText(),
+                    tfPassword.getText(),
+                    tfProtocol.getText(),
+                    tfFolder.getText(),
+                    cbTls.isSelected()
+            );
             this.setVisible(false);
             this.dispose();
         });

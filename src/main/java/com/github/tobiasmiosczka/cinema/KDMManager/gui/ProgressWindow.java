@@ -10,21 +10,23 @@ import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import java.awt.*;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-public class LoadingWindow extends JFrame implements IUpdateProgress {
+public class ProgressWindow extends JFrame implements IUpdateProgress {
 
-    private JProgressBar    pbMajor;
-    private JProgressBar pbMinor;
+    private JProgressBar    pbMajor,
+                            pbMinor;
     private JScrollPane     spDebug;
     private JTextArea       taDebug;
     private JButton         btOk;
 
     private static final DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
-    public LoadingWindow() {
+    public ProgressWindow() {
         this.init();
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.pack();
@@ -93,9 +95,9 @@ public class LoadingWindow extends JFrame implements IUpdateProgress {
     }
 
     @Override
-    public void onDoneSending(int count) {
+    public void onDoneUploading(int count) {
         pbMajor.setValue(pbMajor.getMaximum());
-        logMessage("Done sending " + count + " KDMs.");
+        logMessage("Done uploading " + count + " KDMs.");
     }
 
     @Override

@@ -119,7 +119,7 @@ public class Program {
                 FtpHelper ftpHelper = new FtpHelper(config.getFtpLogins());
                 ftpHelper.uploadFiles(kdms, iUpdateProgress);
             } catch (IOException | FtpException e) {
-                iUpdateProgress.onErrorOccurred("Error occurred while sending KDMs: ", e);
+                iUpdateProgress.onErrorOccurred("Error occurred while uploading KDMs: ", e);
                 return;
             }
             iUpdateProgress.onDone(System.currentTimeMillis() - start);

@@ -42,7 +42,7 @@ public class FtpHelper {
         for (KDM kdm : kdms) {
             FTPClient ftpClient = serverMap.get(kdm.getServer());
             if (ftpClient == null) {//what should be done, if the kdm is for an unknown server? probably just skip it
-                iUpdateProgress.logMessage("Error while sending KDMs. Unknown Server " + kdm.getServer());
+                iUpdateProgress.logMessage("Error occurred while uploading KDMs. Unknown Server to " + kdm.getServer());
                 continue;
             }
             if (!ftpClient.storeFile(kdm.getFileName(), StringHelper.toInputStream(kdm.getData()))) {
@@ -50,6 +50,6 @@ public class FtpHelper {
             }
             iUpdateProgress.onKdmUploaded(kdm, ftpLoginMap.get(kdm.getServer()), ++current, total);
         }
-        iUpdateProgress.onDoneSending(current);
+        iUpdateProgress.onDoneUploading(current);
     }
 }

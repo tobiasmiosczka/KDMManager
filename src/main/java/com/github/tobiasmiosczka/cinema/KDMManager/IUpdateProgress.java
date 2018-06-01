@@ -11,7 +11,7 @@ public interface IUpdateProgress {
     void onKdmUploaded(KDM kdm, FtpLogin ftpLogin, int current, int total);
     void onKdmFound(KDM kdm);
     void onDoneLoading(int count);
-    void onDoneSending(int count);
+    void onDoneUploading(int count);
     void onDone(long timeInMilliseconds);
     void onErrorOccurred(String message, Throwable throwable);
     void logMessage(String message);

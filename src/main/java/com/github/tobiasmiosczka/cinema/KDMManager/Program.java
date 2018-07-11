@@ -95,8 +95,7 @@ public class Program {
         try {
             XmlHelper.saveConfig(config, new FileOutputStream(filename));
         } catch (IOException e) {
-            //TODO: implement
-            e.printStackTrace();
+            iUpdateGui.onErrorOccurred("Error while saving config.xml: " + e.getMessage());
         }
     }
 

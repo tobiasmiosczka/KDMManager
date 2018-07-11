@@ -35,7 +35,7 @@ In order to work, the program must be run on a computer, which is connected to t
 Further work
 -------------------------------------
 - [ ] Passwords should be saved encoded.
-- [ ] Implement a better way to 
+- [ ] Implement a better way to distinguish the servers.
 
 [1]:https://github.com/TobiasMiosczka/KDMManager/releases
 [2]:https://java.com/de/download/

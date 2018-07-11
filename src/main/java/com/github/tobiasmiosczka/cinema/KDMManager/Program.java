@@ -100,6 +100,17 @@ public class Program {
     }
 
     public void loadKdms(boolean ignoreExpiredKdms) {
+
+        if (config.getEmailLogins().isEmpty()) {
+            iUpdateGui.onErrorOccurred("No e-mail logins specified.");
+            return;
+        }
+
+        if (config.getFtpLogins().isEmpty()) {
+            iUpdateGui.onErrorOccurred("No ftp logins specified.");
+            return;
+        }
+
         new Thread(() -> {
             Collection<KDM> kdms;
             long start = System.currentTimeMillis();

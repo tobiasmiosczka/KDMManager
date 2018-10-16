@@ -27,7 +27,6 @@ public class EmailLoginDialog extends JDialog {
         super((java.awt.Frame) null, true);
         setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
         this.init(emailLogin);
-        this.setPreferredSize(new Dimension(330, 265));
         this.pack();
     }
 
@@ -46,7 +45,7 @@ public class EmailLoginDialog extends JDialog {
 
         this.setLayout(null);
         Container c = this.getContentPane();
-        c.setPreferredSize(new Dimension(330, 240));
+        c.setPreferredSize(new Dimension(315, 225));
 
         JLabel lbDescription = new JLabel("Description: ");
         lbDescription.setBounds(5, 5, 100, 20);

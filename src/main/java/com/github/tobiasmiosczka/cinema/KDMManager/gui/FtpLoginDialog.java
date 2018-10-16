@@ -25,7 +25,6 @@ public class FtpLoginDialog extends JDialog {
         super((java.awt.Frame) null, true);
         setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
         this.init(ftpLogin);
-        this.setPreferredSize(new Dimension(330, 215));
         this.pack();
     }
 
@@ -44,7 +43,7 @@ public class FtpLoginDialog extends JDialog {
 
         this.setLayout(null);
         Container c = this.getContentPane();
-        c.setPreferredSize(new Dimension(330, 265));
+        c.setPreferredSize(new Dimension(315, 175));
 
         JLabel lbDescription = new JLabel("Description: ");
         lbDescription.setBounds(5, 5, 100, 20);

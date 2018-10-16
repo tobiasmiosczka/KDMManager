@@ -65,7 +65,7 @@ public class Window extends JFrame implements IUpdateGui {
         c.add(lEmailLoginList);
 
         JButton btAddEmailLogin = new JButton("Add");
-        btAddEmailLogin.addActionListener(a -> program.addEmailLogin(EmailLoginDialog.getEmailLogin(new EmailLogin("","", 21, "", "", "pop3s", "INBOX", false))));
+        btAddEmailLogin.addActionListener(a -> program.addEmailLogin(EmailLoginDialog.getEmailLogin(new EmailLogin("","", 995, "", "", "pop3s", "INBOX", false))));
         btAddEmailLogin.setBounds(5, 145, 110, 30);
         c.add(btAddEmailLogin);
 
@@ -104,7 +104,7 @@ public class Window extends JFrame implements IUpdateGui {
         c.add(lFtpLoginList);
 
         JButton btAddFtpLogin = new JButton("Add");
-        btAddFtpLogin.addActionListener(a -> program.addFtpLogin(FtpLoginDialog.getFtpLogin(new FtpLogin("","", 995, "", "", ""))));
+        btAddFtpLogin.addActionListener(a -> program.addFtpLogin(FtpLoginDialog.getFtpLogin(new FtpLogin("","", 21, "", "", ""))));
         btAddFtpLogin.setBounds(5, 320, 110, 30);
         c.add(btAddFtpLogin);
 

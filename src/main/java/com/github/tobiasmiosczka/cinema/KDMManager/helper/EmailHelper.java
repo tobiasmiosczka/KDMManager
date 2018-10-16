@@ -36,8 +36,8 @@ public class EmailHelper {
             String fileName = zipEntry.getName();
             if (fileName.endsWith(".xml")) {
                 result.add(getKdmFromInputStream(iUpdateProgress, zis, fileName));
-                zipEntry = zis.getNextEntry();
             }
+            zipEntry = zis.getNextEntry();
         }
         zis.closeEntry();
         zis.close();

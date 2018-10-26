@@ -102,12 +102,12 @@ public class Program {
     public void loadKdms(boolean ignoreExpiredKdms) {
 
         if (config.getEmailLogins().isEmpty()) {
-            iUpdateGui.onErrorOccurred("No e-mail logins specified.");
+            iUpdateGui.onErrorOccurred("No e-mail login specified.");
             return;
         }
 
         if (config.getFtpLogins().isEmpty()) {
-            iUpdateGui.onErrorOccurred("No ftp logins specified.");
+            iUpdateGui.onErrorOccurred("No ftp login specified.");
             return;
         }
 

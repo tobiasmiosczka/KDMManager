@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
@@ -71,7 +70,6 @@ public class EmailHelper {
         } catch (UnsupportedEncodingException e) {
             return null;
         }
-
     }
 
     private static Collection<KDM> handleMessages(Message[] messages, IUpdateProgress iUpdateProgress) throws IOException, JDOMException, ParseException, MessagingException {
@@ -85,9 +83,6 @@ public class EmailHelper {
                     BodyPart bodyPart = multipart.getBodyPart(part);
                     String fileName = decode(bodyPart.getFileName());
                     if (fileName != null && (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition()) || !StringHelper.isBlank(fileName))) {
-                        System.out.println(fileName);
-                        System.out.println(bodyPart.getFileName());
-                        System.out.println();
                         if (fileName.endsWith(".zip"))
                             kdms.addAll(unzip(iUpdateProgress, bodyPart.getInputStream()));
                         else if (fileName.endsWith(".xml"))

@@ -14,8 +14,10 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Store;
+import javax.mail.internet.MimeUtility;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Base64;
@@ -61,22 +63,15 @@ public class EmailHelper {
     }
 
     private static String decode(String s) {
-        if (s == null)
+        if(s == null) {
             return null;
-        if (s.matches("^=\\?.*\\?.*\\?.*\\?=$")) {
-            s = s.substring(2, s.length() - 2);
-            String[] strings = s.split("\\?"); //[0]=charset, [1]=cypher, [2]=text
-            switch (strings[1]) {
-                case "Q": //Type is quoted printable
-                    return strings[2];
-                case "B": //Type is base64
-                    return new String(Base64.getDecoder().decode(strings[2]));
-                default: //Type is unknown
-                    return strings[2];
-            }
-        } else {
-            return s;
         }
+        try {
+            return MimeUtility.decodeText(s);
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
+
     }
 
     private static Collection<KDM> handleMessages(Message[] messages, IUpdateProgress iUpdateProgress) throws IOException, JDOMException, ParseException, MessagingException {
@@ -90,6 +85,9 @@ public class EmailHelper {
                     BodyPart bodyPart = multipart.getBodyPart(part);
                     String fileName = decode(bodyPart.getFileName());
                     if (fileName != null && (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition()) || !StringHelper.isBlank(fileName))) {
+                        System.out.println(fileName);
+                        System.out.println(bodyPart.getFileName());
+                        System.out.println();
                         if (fileName.endsWith(".zip"))
                             kdms.addAll(unzip(iUpdateProgress, bodyPart.getInputStream()));
                         else if (fileName.endsWith(".xml"))

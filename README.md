@@ -1,13 +1,13 @@
-# KDMManager
-KDMManager is a tool for projectionists to automatically download KDMs from e-mail servers and upload them to screen servers.
+# KdmManager
+KdmManager is a tool for projectionists to automatically download KDMs from e-mail servers and upload them to screen servers.
 
 Download
 -------------------------------------
-You can download the latest release [here][1].
+The latest release can be downloaded [here][1].
 
 Setup
 -------------------------------------
-In order to assign each downloaded KDM to a server/projector, each ftp login needs a specific string value (in the program it is called "serial"), which can be copied from an existing KDM. The code below shows where this attribute is stored inside a KDM. 
+In order to assign each downloaded KDM to a server/projector, each ftp login needs a specific string value (serial), which can be copied from an existing KDM. The code below shows where this attribute is stored inside a KDM. 
 
 ```
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
@@ -28,9 +28,9 @@ In order to assign each downloaded KDM to a server/projector, each ftp login nee
 
 Requirements
 -------------------------------------
-For the KDMManager a Java Virtual Machine JRE 1.8 or higher is required. 
+Java Runtime Enviroment JRE 1.8 or higher is required. 
 The latest JRE can be downloaded [here][2].
-In order to work, the program must be run on a computer, which is connected to the screen servers (i.e. via a private network) and the email servers (i.e. via internet).
+In order to work, the program must be run on a computer, which is connected to the screen servers (i.e. via LAN) and the email servers (i.e. via internet).
 
 Further work
 -------------------------------------

@@ -65,43 +65,59 @@ public class XmlHelper {
         return saxBuilder.build(inputStream);
     }
 
-    public static String getKdmTitle(Document document) {
-        return document.getRootElement()
-                .getChild("AuthenticatedPublic", ns1)
-                .getChild("RequiredExtensions", ns1)
-                .getChild("KDMRequiredExtensions", ns2)
-                .getChild("ContentTitleText", ns2)
-                .getValue();
+    public static String getKdmTitle(Document document) throws InvalidKdmException {
+        try {
+            return document.getRootElement()
+                    .getChild("AuthenticatedPublic", ns1)
+                    .getChild("RequiredExtensions", ns1)
+                    .getChild("KDMRequiredExtensions", ns2)
+                    .getChild("ContentTitleText", ns2)
+                    .getValue();
+        } catch (NullPointerException e) {
+            throw new InvalidKdmException();
+        }
     }
 
-    public static String getKdmServer(Document document) {
-        return document.getRootElement()
-                .getChild("AuthenticatedPublic", ns1)
-                .getChild("RequiredExtensions", ns1)
-                .getChild("KDMRequiredExtensions", ns2)
-                .getChild("Recipient", ns2)
-                .getChild("X509SubjectName", ns2)
-                .getValue();
+    public static String getKdmServer(Document document) throws InvalidKdmException {
+        try {
+            return document.getRootElement()
+                    .getChild("AuthenticatedPublic", ns1)
+                    .getChild("RequiredExtensions", ns1)
+                    .getChild("KDMRequiredExtensions", ns2)
+                    .getChild("Recipient", ns2)
+                    .getChild("X509SubjectName", ns2)
+                    .getValue();
+        } catch (NullPointerException e) {
+            throw new InvalidKdmException();
+        }
     }
 
-    public static Date getKdmValidFrom(Document document) throws ParseException {
-        String value = document.getRootElement()
-                .getChild("AuthenticatedPublic", ns1)
-                .getChild("RequiredExtensions", ns1)
-                .getChild("KDMRequiredExtensions", ns2)
-                .getChild("ContentKeysNotValidBefore", ns2)
-                .getValue();
-        return dateFormat.parse(value);
+    public static Date getKdmValidFrom(Document document) throws ParseException, InvalidKdmException {
+        try {
+            String value = document.getRootElement()
+                    .getChild("AuthenticatedPublic", ns1)
+                    .getChild("RequiredExtensions", ns1)
+                    .getChild("KDMRequiredExtensions", ns2)
+                    .getChild("ContentKeysNotValidBefore", ns2)
+                    .getValue();
+            return dateFormat.parse(value);
+        } catch (NullPointerException e) {
+            throw new InvalidKdmException();
+        }
     }
 
-    public static Date getKdmValidTo(Document document) throws ParseException {
-        String value = document.getRootElement()
-                .getChild("AuthenticatedPublic", ns1)
-                .getChild("RequiredExtensions", ns1)
-                .getChild("KDMRequiredExtensions", ns2)
-                .getChild("ContentKeysNotValidAfter", ns2)
-                .getValue();
-        return dateFormat.parse(value);
+    public static Date getKdmValidTo(Document document) throws ParseException, InvalidKdmException {
+        try {
+            String value = document.getRootElement()
+                    .getChild("AuthenticatedPublic", ns1)
+                    .getChild("RequiredExtensions", ns1)
+                    .getChild("KDMRequiredExtensions", ns2)
+                    .getChild("ContentKeysNotValidAfter", ns2)
+                    .getValue();
+            return dateFormat.parse(value);
+        } catch (NullPointerException e) {
+            throw new InvalidKdmException();
+        }
     }
 
     private static Element ftpLoginToElement(FtpLogin ftpLogin) {
@@ -154,13 +170,19 @@ public class XmlHelper {
 
     public static Config loadConfig(Document document) throws ConfigParseException {
         Config config = new Config();
-        Collection<FtpLogin> ftpLoginMap = config.getFtpLogins();
-        for (Element element1 : document.getRootElement().getChild("ftpLogins").getChildren()) {
-            ftpLoginMap.add(elementToFtpLogin(element1));
+        Collection<FtpLogin> ftpLoginList = config.getFtpLogins();
+        Element ftpLogins = document.getRootElement().getChild("ftpLogins");
+        if (ftpLogins != null) {
+            for (Element element1 : ftpLogins.getChildren()) {
+                ftpLoginList.add(elementToFtpLogin(element1));
+            }
         }
-        Collection<EmailLogin> emailLogins = config.getEmailLogins();
-        for (Element element : document.getRootElement().getChild("emailLogins").getChildren()) {
-            emailLogins.add(elementToEmailLogin(element));
+        Collection<EmailLogin> emailLoginList = config.getEmailLogins();
+        Element emailLogins = document.getRootElement().getChild("emailLogins");
+        if (emailLogins != null) {
+            for (Element element : emailLogins.getChildren()) {
+                emailLoginList.add(elementToEmailLogin(element));
+            }
         }
         return config;
     }

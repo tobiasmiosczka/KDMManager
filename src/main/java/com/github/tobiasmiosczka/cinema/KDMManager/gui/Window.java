@@ -47,7 +47,7 @@ public class Window extends JFrame implements IUpdateGui {
     }
 
     private void init() {
-        this.setTitle("KDMManager V0.8");
+        this.setTitle("KDMManager V 1.0.0");
         this.setLayout(null);
         this.setResizable(false);
         Container c = this.getContentPane();

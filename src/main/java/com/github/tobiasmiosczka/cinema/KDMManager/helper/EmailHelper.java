@@ -36,7 +36,11 @@ public class EmailHelper {
         while (zipEntry != null) {
             String fileName = zipEntry.getName();
             if (fileName.endsWith(".xml")) {
-                result.add(getKdmFromInputStream(iUpdateProgress, zis, fileName));
+                try {
+                    result.add(getKdmFromInputStream(iUpdateProgress, zis, fileName));
+                } catch (InvalidKdmException e) {
+                    //TODO: Exception Handling
+                }
             }
             zipEntry = zis.getNextEntry();
         }
@@ -45,7 +49,7 @@ public class EmailHelper {
         return result;
     }
 
-    private static KDM getKdmFromInputStream(IUpdateProgress iUpdateProgress, InputStream inputStream, String fileName) throws JDOMException, IOException, ParseException {
+    private static KDM getKdmFromInputStream(IUpdateProgress iUpdateProgress, InputStream inputStream, String fileName) throws JDOMException, IOException, ParseException, InvalidKdmException {
         Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8.name());
         String sData = scanner.useDelimiter("\\A").next();
         Document document = XmlHelper.getDocument(StringHelper.toInputStream(sData));
@@ -86,7 +90,11 @@ public class EmailHelper {
                         if (fileName.endsWith(".zip"))
                             kdms.addAll(unzip(iUpdateProgress, bodyPart.getInputStream()));
                         else if (fileName.endsWith(".xml"))
-                            kdms.add(getKdmFromInputStream(iUpdateProgress, bodyPart.getInputStream(), fileName));
+                            try {
+                                kdms.add(getKdmFromInputStream(iUpdateProgress, bodyPart.getInputStream(), fileName));
+                            } catch (InvalidKdmException e) {
+                                //TODO: Exception Handling
+                            }
                     }
                 }
             }

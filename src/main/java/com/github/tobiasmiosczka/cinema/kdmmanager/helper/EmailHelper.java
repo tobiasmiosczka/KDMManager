@@ -1,8 +1,8 @@
-package com.github.tobiasmiosczka.cinema.KDMManager.helper;
+package com.github.tobiasmiosczka.cinema.kdmmanager.helper;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.IUpdateProgress;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;
+import com.github.tobiasmiosczka.cinema.kdmmanager.IUpdateProgress;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.EmailLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.KDM;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 
@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
@@ -29,18 +28,15 @@ import java.util.zip.ZipInputStream;
 
 public class EmailHelper {
 
-    private static Collection<KDM> unzip(IUpdateProgress iUpdateProgress, InputStream inputStream) throws IOException, JDOMException, ParseException {
+    private static Collection<KDM> unzip(IUpdateProgress iUpdateProgress, InputStream inputStream) throws IOException, JDOMException, InvalidKdmException {
         Collection<KDM> result = new HashSet<>();
         ZipInputStream zis = new ZipInputStream(inputStream);
         ZipEntry zipEntry = zis.getNextEntry();
         while (zipEntry != null) {
             String fileName = zipEntry.getName();
             if (fileName.endsWith(".xml")) {
-                try {
-                    result.add(getKdmFromInputStream(iUpdateProgress, zis, fileName));
-                } catch (InvalidKdmException e) {
-                    //TODO: Exception Handling
-                }
+                result.add(getKdmFromInputStream(iUpdateProgress, zis, fileName));
+
             }
             zipEntry = zis.getNextEntry();
         }
@@ -49,7 +45,7 @@ public class EmailHelper {
         return result;
     }
 
-    private static KDM getKdmFromInputStream(IUpdateProgress iUpdateProgress, InputStream inputStream, String fileName) throws JDOMException, IOException, ParseException, InvalidKdmException {
+    private static KDM getKdmFromInputStream(IUpdateProgress iUpdateProgress, InputStream inputStream, String fileName) throws JDOMException, IOException, InvalidKdmException {
         Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8.name());
         String sData = scanner.useDelimiter("\\A").next();
         Document document = XmlHelper.getDocument(StringHelper.toInputStream(sData));
@@ -76,7 +72,7 @@ public class EmailHelper {
         }
     }
 
-    private static Collection<KDM> handleMessages(Message[] messages, IUpdateProgress iUpdateProgress) throws IOException, JDOMException, ParseException, MessagingException {
+    private static Collection<KDM> handleMessages(Message[] messages, IUpdateProgress iUpdateProgress) throws IOException, JDOMException, MessagingException, InvalidKdmException {
         Collection<KDM> kdms = new HashSet<>();
         for (int i = 0; i < messages.length; ++i) {
             Message message = messages[i];
@@ -90,11 +86,8 @@ public class EmailHelper {
                         if (fileName.endsWith(".zip"))
                             kdms.addAll(unzip(iUpdateProgress, bodyPart.getInputStream()));
                         else if (fileName.endsWith(".xml"))
-                            try {
-                                kdms.add(getKdmFromInputStream(iUpdateProgress, bodyPart.getInputStream(), fileName));
-                            } catch (InvalidKdmException e) {
-                                //TODO: Exception Handling
-                            }
+                            kdms.add(getKdmFromInputStream(iUpdateProgress, bodyPart.getInputStream(), fileName));
+
                     }
                 }
             }
@@ -103,7 +96,7 @@ public class EmailHelper {
         return kdms;
     }
 
-    public static Collection<KDM> getKdmsFromEmail(Collection<EmailLogin> emailLogins, IUpdateProgress iUpdateProgress) throws MessagingException, IOException, JDOMException, ParseException {
+    public static Collection<KDM> getKdmsFromEmail(Collection<EmailLogin> emailLogins, IUpdateProgress iUpdateProgress) throws MessagingException, IOException, JDOMException, InvalidKdmException {
         Collection<KDM> kdms = new HashSet<>();
         int current = 0;
         for (EmailLogin emailLogin : emailLogins) {

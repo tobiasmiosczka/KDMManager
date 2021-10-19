@@ -1,8 +1,8 @@
-package com.github.tobiasmiosczka.cinema.KDMManager.helper;
+package com.github.tobiasmiosczka.cinema.kdmmanager.helper;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.Config;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.EmailLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.FtpLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.Config;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -14,7 +14,6 @@ import org.jdom2.output.XMLOutputter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -50,11 +49,11 @@ public class XmlHelper {
     private static boolean getBooleanValue(Element element, String name) throws ConfigParseException {
         try {
              String string = element.getChild(name).getValue();
-             switch (string) {
-                 case "true": return true;
-                 case "false": return false;
-                 default: throw new ConfigParseException(element, name, "Could not parse boolean value.");
-             }
+            return switch (string) {
+                case "true" -> true;
+                case "false" -> false;
+                default -> throw new ConfigParseException(element, name, "Could not parse boolean value.");
+            };
         } catch (NullPointerException e) {
             throw new ConfigParseException(element, name, "Could not parse boolean value.");
         }

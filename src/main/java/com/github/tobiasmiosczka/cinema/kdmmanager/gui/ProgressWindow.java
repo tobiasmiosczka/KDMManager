@@ -1,9 +1,9 @@
-package com.github.tobiasmiosczka.cinema.KDMManager.gui;
+package com.github.tobiasmiosczka.cinema.kdmmanager.gui;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.IUpdateProgress;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;
+import com.github.tobiasmiosczka.cinema.kdmmanager.IUpdateProgress;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.EmailLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.FtpLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.KDM;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -105,7 +105,7 @@ public class ProgressWindow extends JFrame implements IUpdateProgress {
             pbMajor.setMaximum(total);
             pbMajor.setValue(current);
             pbMajor.setString("Loading Emails from: " + emailLogin.toString());
-            logMessage("Loading Emails from " + emailLogin.toString() + ".");
+            logMessage("Loading Emails from " + emailLogin + ".");
         });
     }
 

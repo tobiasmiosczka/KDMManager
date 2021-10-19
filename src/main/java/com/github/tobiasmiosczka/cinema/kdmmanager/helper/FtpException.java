@@ -1,4 +1,4 @@
-package com.github.tobiasmiosczka.cinema.KDMManager.helper;
+package com.github.tobiasmiosczka.cinema.kdmmanager.helper;
 
 public class FtpException extends Throwable {
 

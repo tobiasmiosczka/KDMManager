@@ -1,7 +1,7 @@
-package com.github.tobiasmiosczka.cinema.KDMManager;
+package com.github.tobiasmiosczka.cinema.kdmmanager;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.gui.ProgressWindow;
-import com.github.tobiasmiosczka.cinema.KDMManager.gui.Window;
+import com.github.tobiasmiosczka.cinema.kdmmanager.gui.ProgressWindow;
+import com.github.tobiasmiosczka.cinema.kdmmanager.gui.Window;
 
 public class Starter {
 

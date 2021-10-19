@@ -1,7 +1,7 @@
-package com.github.tobiasmiosczka.cinema.KDMManager;
+package com.github.tobiasmiosczka.cinema.kdmmanager;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.EmailLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.FtpLogin;
 
 import java.util.List;
 

@@ -1,14 +1,10 @@
-package com.github.tobiasmiosczka.cinema.KDMManager;
+package com.github.tobiasmiosczka.cinema.kdmmanager;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.helper.ConfigParseException;
-import com.github.tobiasmiosczka.cinema.KDMManager.helper.EmailHelper;
-import com.github.tobiasmiosczka.cinema.KDMManager.helper.FtpHelper;
-import com.github.tobiasmiosczka.cinema.KDMManager.helper.XmlHelper;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.Config;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.helper.FtpException;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;
+import com.github.tobiasmiosczka.cinema.kdmmanager.helper.*;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.Config;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.EmailLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.FtpLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.KDM;
 import org.jdom2.JDOMException;
 
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package com.github.tobiasmiosczka.cinema.KDMManager.pojo;
+package com.github.tobiasmiosczka.cinema.kdmmanager.pojo;
 
 import java.util.ArrayList;
 import java.util.List;

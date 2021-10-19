@@ -1,9 +1,9 @@
-package com.github.tobiasmiosczka.cinema.KDMManager.gui;
+package com.github.tobiasmiosczka.cinema.kdmmanager.gui;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.IUpdateGui;
-import com.github.tobiasmiosczka.cinema.KDMManager.Program;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.EmailLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.IUpdateGui;
+import com.github.tobiasmiosczka.cinema.kdmmanager.Program;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.EmailLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.FtpLogin;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;

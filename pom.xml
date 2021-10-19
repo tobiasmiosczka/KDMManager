@@ -23,7 +23,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>com.github.tobiasmiosczka.cinema.KDMManager.Starter</mainClass>
+							<mainClass>com.github.tobiasmiosczka.cinema.kdmmanager.Starter</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -41,7 +41,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.github.tobiasmiosczka.cinema.KDMManager.Starter</mainClass>
+							<mainClass>com.github.tobiasmiosczka.cinema.kdmmanager.Starter</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

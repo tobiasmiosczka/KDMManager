@@ -1,8 +1,8 @@
-package com.github.tobiasmiosczka.cinema.KDMManager.helper;
+package com.github.tobiasmiosczka.cinema.kdmmanager.helper;
 
-import com.github.tobiasmiosczka.cinema.KDMManager.IUpdateProgress;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
-import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;
+import com.github.tobiasmiosczka.cinema.kdmmanager.IUpdateProgress;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.FtpLogin;
+import com.github.tobiasmiosczka.cinema.kdmmanager.pojo.KDM;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 

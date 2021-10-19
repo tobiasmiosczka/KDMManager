@@ -11,13 +11,11 @@ import com.github.tobiasmiosczka.cinema.KDMManager.pojo.FtpLogin;
 import com.github.tobiasmiosczka.cinema.KDMManager.pojo.KDM;
 import org.jdom2.JDOMException;
 
-import javax.mail.MessagingException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 public class Program {
@@ -117,13 +115,13 @@ public class Program {
             iUpdateProgress.onBegin();
             try {
                 kdms = EmailHelper.getKdmsFromEmail(config.getEmailLogins(), iUpdateProgress);
-            } catch (MessagingException | JDOMException | ParseException | IOException e) {
+            } catch (Exception e) {
                 iUpdateProgress.onErrorOccurred("Error occurred while loading KDMs from Email: ", e);
                 return;
             }
             if (ignoreExpiredKdms) {
-                Date now = new Date();
-                kdms.removeIf(kdm -> kdm.getValidTo().before(now));
+                LocalDateTime now = LocalDateTime.now();
+                kdms.removeIf(kdm -> kdm.getValidTo().isBefore(now));
             }
             try {
                 FtpHelper ftpHelper = new FtpHelper(config.getFtpLogins());

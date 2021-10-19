@@ -1,6 +1,6 @@
 package com.github.tobiasmiosczka.cinema.KDMManager.pojo;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class KDM {
 
@@ -8,10 +8,10 @@ public class KDM {
                             fileName,
                             data,
                             server;
-    private final Date  validFrom,
-                        validTo;
+    private final LocalDateTime validFrom,
+                                validTo;
 
-    public KDM(String title, String fileName, String data, String server, Date validFrom, Date validTo) {
+    public KDM(String title, String fileName, String data, String server, LocalDateTime validFrom, LocalDateTime validTo) {
         this.title = title;
         this.fileName = fileName;
         this. data = data;
@@ -36,11 +36,11 @@ public class KDM {
         return server;
     }
 
-    public Date getValidFrom() {
+    public LocalDateTime getValidFrom() {
         return validFrom;
     }
 
-    public Date getValidTo() {
+    public LocalDateTime getValidTo() {
         return validTo;
     }
 }

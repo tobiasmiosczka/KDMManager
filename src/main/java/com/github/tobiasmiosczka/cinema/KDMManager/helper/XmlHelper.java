@@ -14,17 +14,16 @@ import org.jdom2.output.XMLOutputter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.Date;
 
 public class XmlHelper {
 
     private static final Namespace ns1 = Namespace.getNamespace("", "http://www.smpte-ra.org/schemas/430-3/2006/ETM");
     private static final Namespace ns2 = Namespace.getNamespace("", "http://www.smpte-ra.org/schemas/430-1/2006/KDM");
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
     private static final SAXBuilder saxBuilder = new SAXBuilder();
     private static final XMLOutputter xmlOutputter = new XMLOutputter();
 
@@ -92,7 +91,7 @@ public class XmlHelper {
         }
     }
 
-    public static Date getKdmValidFrom(Document document) throws ParseException, InvalidKdmException {
+    public static LocalDateTime getKdmValidFrom(Document document) throws InvalidKdmException {
         try {
             String value = document.getRootElement()
                     .getChild("AuthenticatedPublic", ns1)
@@ -100,13 +99,13 @@ public class XmlHelper {
                     .getChild("KDMRequiredExtensions", ns2)
                     .getChild("ContentKeysNotValidBefore", ns2)
                     .getValue();
-            return dateFormat.parse(value);
+            return LocalDateTime.parse(value, formatter);
         } catch (NullPointerException e) {
             throw new InvalidKdmException();
         }
     }
 
-    public static Date getKdmValidTo(Document document) throws ParseException, InvalidKdmException {
+    public static LocalDateTime getKdmValidTo(Document document) throws InvalidKdmException {
         try {
             String value = document.getRootElement()
                     .getChild("AuthenticatedPublic", ns1)
@@ -114,7 +113,7 @@ public class XmlHelper {
                     .getChild("KDMRequiredExtensions", ns2)
                     .getChild("ContentKeysNotValidAfter", ns2)
                     .getValue();
-            return dateFormat.parse(value);
+            return LocalDateTime.parse(value, formatter);
         } catch (NullPointerException e) {
             throw new InvalidKdmException();
         }

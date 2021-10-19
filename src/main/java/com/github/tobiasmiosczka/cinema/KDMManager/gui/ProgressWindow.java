@@ -13,8 +13,7 @@ import javax.swing.JTextArea;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 public class ProgressWindow extends JFrame implements IUpdateProgress {
 
@@ -24,7 +23,7 @@ public class ProgressWindow extends JFrame implements IUpdateProgress {
     private JTextArea       taDebug;
     private JButton         btOk;
 
-    private static final DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
     public ProgressWindow() {
         this.init();
@@ -76,7 +75,7 @@ public class ProgressWindow extends JFrame implements IUpdateProgress {
         EventQueue.invokeLater(() -> {
             logMessage("KDM uploaded:"
                     + "\n    Server: " + ftpLogin.getDescription()
-                    + "\n    Valid : [" + dateFormat.format(kdm.getValidFrom()) + " - " + dateFormat.format(kdm.getValidTo()) + "]"
+                    + "\n    Valid : [" + kdm.getValidFrom().format(formatter) + " - " + kdm.getValidTo().format(formatter) + "]"
                     + "\n    DCP   : " + kdm.getTitle());
             pbMajor.setString(current + "/" + total);
             pbMajor.setMaximum(total);
@@ -86,7 +85,7 @@ public class ProgressWindow extends JFrame implements IUpdateProgress {
 
     @Override
     public void onKdmFound(KDM kdm) {
-        logMessage("KDM found: " + " Valid: [" + dateFormat.format(kdm.getValidFrom()) + " - " + dateFormat.format(kdm.getValidTo()) + "] " + kdm.getTitle());
+        logMessage("KDM found: " + " Valid: [" + kdm.getValidFrom().format(formatter) + " - " + kdm.getValidTo().format(formatter) + "] " + kdm.getTitle());
     }
 
     @Override

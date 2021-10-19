@@ -22,4 +22,6 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+### config.xml ###
 config.xml
